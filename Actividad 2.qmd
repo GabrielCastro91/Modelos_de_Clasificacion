@@ -1,11 +1,7 @@
 ---
-title: "Actividad 2: Modelos de clasificación"
+title: Caso de Modelos de Clasificación"
 author: 
   - "Gabriel Castro" 
-  - "Leonardo Cortes"
-  - "Karolina Cedeño"
-language:
-  author-title: "Autores"
 lang: es
 theme: "minty"
 date: "2026-1-12"
@@ -427,4 +423,5 @@ Si bien es cierto que Teleco podría tener conocimiento de que los clientes con 
 -   Al tener una especificidad tan alta, la empresa **evita molestar al 91% de sus clientes leales** con ofertas innecesarias, protegiendo así el Valor de Vida del Cliente (CLV).
 
 -   Es posible para la dirección **tomar medidas correctivas anticipadas** (como ajustes en la estrategia de precios o mejora de infraestructura en zonas específicas) antes de que el impacto financiero se refleje en el balance general.
+
 
