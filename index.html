@@ -3914,7 +3914,7 @@ window.onload = function() {
 </div>
 </div>
 </div>
-<p>Podemos observar quer tres de nuestras variables poseen una categoría redundante. “<strong>No internet service</strong>” Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple “<strong>No</strong>”.</p>
+<p>Podemos observar que tres de nuestras variables poseen una categoría redundante. “<strong>No internet service</strong>” Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple “<strong>No</strong>”.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Código</summary>
@@ -4123,7 +4123,7 @@ Number of Fisher Scoring iterations: 6</code></pre>
 <p>Las tres variables poseen un p-valor menor 0.05, lo que nos indica que los resultados arrojados por el modelo son estadisticamente significativos, no producto del azar. Ésto ya nos da puntos de enfoque a los cuales podemos dirigir esfuerzos para prevenir el avandono. Ejemplos de dichos esfuerzos serían proporcionados más adelante segun el desempeño del modelo.</p>
 <section id="evaluación-del-modelo" class="level4" data-number="4.1.1">
 <h4 data-number="4.1.1" class="anchored" data-anchor-id="evaluación-del-modelo"><span class="header-section-number">4.1.1</span> Evaluación del modelo</h4>
-<p>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha insteractuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</p>
+<p>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha interactuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Código</summary>
@@ -4400,7 +4400,7 @@ Prediction   0   1
 </tr>
 </tbody>
 </table>
-<p>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar decidido agregar a esta tabla de comparación la métrica de “pos(positive) pred(prediction) value” la cual mide la precisión de los aciertos al predecir “Sí/Yes”. Esto nos ayudará a enfocar un aspecto importante de la comparación.</p>
+<p>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar se ha decidido agregar a esta tabla de comparación la métrica de “pos(positive) pred(prediction) value” la cual mide la precisión de los aciertos al predecir “Sí/Yes”. Esto nos ayudará a enfocar un aspecto importante de la comparación.</p>
 <p>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</p>
 <ul>
 <li><p><strong>El modelo de árbol</strong> <strong>de decisiones</strong> con su <strong>pos pred value</strong> de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una <strong>sensibilidad</strong> de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.</p></li>
@@ -5082,7 +5082,7 @@ Prediction   0   1
 <span id="cb45-236"><a href="#cb45-236" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb45-237"><a href="#cb45-237" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb45-238"><a href="#cb45-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-239"><a href="#cb45-239" aria-hidden="true" tabindex="-1"></a>Podemos observar quer tres de nuestras variables poseen una categoría redundante. &quot;**No internet service**&quot; Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple &quot;**No**&quot;.</span>
+<span id="cb45-239"><a href="#cb45-239" aria-hidden="true" tabindex="-1"></a>Podemos observar que tres de nuestras variables poseen una categoría redundante. &quot;**No internet service**&quot; Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple &quot;**No**&quot;.</span>
 <span id="cb45-240"><a href="#cb45-240" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-243"><a href="#cb45-243" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb45-244"><a href="#cb45-244" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="ot">&lt;-</span> teleco_short <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(Soporte_tecnico,</span>
@@ -5184,7 +5184,7 @@ Prediction   0   1
 <span id="cb45-352"><a href="#cb45-352" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-353"><a href="#cb45-353" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Evaluación del modelo</span></span>
 <span id="cb45-354"><a href="#cb45-354" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-355"><a href="#cb45-355" aria-hidden="true" tabindex="-1"></a>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha insteractuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</span>
+<span id="cb45-355"><a href="#cb45-355" aria-hidden="true" tabindex="-1"></a>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha interactuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</span>
 <span id="cb45-356"><a href="#cb45-356" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-359"><a href="#cb45-359" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb45-360"><a href="#cb45-360" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones sobre el conjunto de prueba</span></span>
@@ -5281,7 +5281,7 @@ Prediction   0   1
 <span id="cb45-457"><a href="#cb45-457" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Precisión (Pos Pred Value)** | 0.6818 | 0.7286 | **Modelo B:** Sus alertas de &quot;abandono&quot; son más certeras. <span class="pp">|</span></span>
 <span id="cb45-458"><a href="#cb45-458" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Confianza (P-Value)** | 3.232e-11 | 9.387e-10 | **Modelo A:** Mayor solidez estadística frente al azar. <span class="pp">|</span></span>
 <span id="cb45-459"><a href="#cb45-459" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-460"><a href="#cb45-460" aria-hidden="true" tabindex="-1"></a>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar decidido agregar a esta tabla de comparación la métrica de &quot;pos(positive) pred(prediction) value&quot; la cual mide la precisión de los aciertos al predecir &quot;Sí/Yes&quot;. Esto nos ayudará a enfocar un aspecto importante de la comparación.</span>
+<span id="cb45-460"><a href="#cb45-460" aria-hidden="true" tabindex="-1"></a>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar se ha decidido agregar a esta tabla de comparación la métrica de &quot;pos(positive) pred(prediction) value&quot; la cual mide la precisión de los aciertos al predecir &quot;Sí/Yes&quot;. Esto nos ayudará a enfocar un aspecto importante de la comparación.</span>
 <span id="cb45-461"><a href="#cb45-461" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-462"><a href="#cb45-462" aria-hidden="true" tabindex="-1"></a>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</span>
 <span id="cb45-463"><a href="#cb45-463" aria-hidden="true" tabindex="-1"></a></span>
