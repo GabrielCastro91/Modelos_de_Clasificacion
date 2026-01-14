@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Gabriel Castro">
+<meta name="author" content="Leonardo Cortes">
+<meta name="author" content="Karolina Cedeño">
+
+<title>Actividad 2: Modelos de clasificación</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Actividad 2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Actividad 2_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Actividad 2_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Actividad 2_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Actividad 2_files/libs/quarto-html/popper.min.js"></script>
+<script src="Actividad 2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Actividad 2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Actividad 2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Actividad 2_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Actividad 2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Actividad 2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Actividad 2_files/libs/bootstrap/bootstrap-eb8e57aaebd81cd9031d412f704ea5b8.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<style>html{ scroll-behavior: smooth; }</style>
+<link href="Actividad 2_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+
+<script src="Actividad 2_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Tabla de contenidos</h2>
+   
+  <ul>
+  <li><a href="#instalación-de-librerías-e-importación-de-dataset" id="toc-instalación-de-librerías-e-importación-de-dataset" class="nav-link active" data-scroll-target="#instalación-de-librerías-e-importación-de-dataset"><span class="header-section-number">1</span> Instalación de librerías e importación de dataset</a></li>
+  <li><a href="#evaluación-de-calidad-de-los-datos" id="toc-evaluación-de-calidad-de-los-datos" class="nav-link" data-scroll-target="#evaluación-de-calidad-de-los-datos"><span class="header-section-number">2</span> Evaluación de calidad de los datos</a>
+  <ul>
+  <li><a href="#estadística-descriptiva-de-datos-numéricos" id="toc-estadística-descriptiva-de-datos-numéricos" class="nav-link" data-scroll-target="#estadística-descriptiva-de-datos-numéricos"><span class="header-section-number">2.1</span> Estadística descriptiva de datos numéricos</a>
+  <ul class="collapse">
+  <li><a href="#apoyo-visual" id="toc-apoyo-visual" class="nav-link" data-scroll-target="#apoyo-visual"><span class="header-section-number">2.1.1</span> Apoyo visual</a></li>
+  <li><a href="#interpretación-de-los-datos" id="toc-interpretación-de-los-datos" class="nav-link" data-scroll-target="#interpretación-de-los-datos"><span class="header-section-number">2.1.2</span> Interpretación de los datos</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#selección-y-transformación-de-variables" id="toc-selección-y-transformación-de-variables" class="nav-link" data-scroll-target="#selección-y-transformación-de-variables"><span class="header-section-number">3</span> Selección y transformación de variables</a></li>
+  <li><a href="#modelos-de-clasificación" id="toc-modelos-de-clasificación" class="nav-link" data-scroll-target="#modelos-de-clasificación"><span class="header-section-number">4</span> Modelos de clasificación</a>
+  <ul>
+  <li><a href="#modelo-de-regresión-logística" id="toc-modelo-de-regresión-logística" class="nav-link" data-scroll-target="#modelo-de-regresión-logística"><span class="header-section-number">4.1</span> Modelo de regresión logística</a>
+  <ul class="collapse">
+  <li><a href="#evaluación-del-modelo" id="toc-evaluación-del-modelo" class="nav-link" data-scroll-target="#evaluación-del-modelo"><span class="header-section-number">4.1.1</span> Evaluación del modelo</a></li>
+  </ul></li>
+  <li><a href="#modelo-de-árbol" id="toc-modelo-de-árbol" class="nav-link" data-scroll-target="#modelo-de-árbol"><span class="header-section-number">4.2</span> Modelo de Árbol</a>
+  <ul class="collapse">
+  <li><a href="#diagrama-de-árbol-de-decisión" id="toc-diagrama-de-árbol-de-decisión" class="nav-link" data-scroll-target="#diagrama-de-árbol-de-decisión"><span class="header-section-number">4.2.1</span> Diagrama de Árbol de decisión</a></li>
+  <li><a href="#evaluación-del-modelo-1" id="toc-evaluación-del-modelo-1" class="nav-link" data-scroll-target="#evaluación-del-modelo-1"><span class="header-section-number">4.2.2</span> Evaluación del modelo</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#elección-de-modelo-y-posible-aplicación" id="toc-elección-de-modelo-y-posible-aplicación" class="nav-link" data-scroll-target="#elección-de-modelo-y-posible-aplicación"><span class="header-section-number">5</span> Elección de modelo y posible aplicación</a>
+  <ul>
+  <li><a href="#comparasión-de-modelos" id="toc-comparasión-de-modelos" class="nav-link" data-scroll-target="#comparasión-de-modelos"><span class="header-section-number">5.1</span> Comparasión de modelos</a></li>
+  <li><a href="#posible-aplicación-y-beneficios" id="toc-posible-aplicación-y-beneficios" class="nav-link" data-scroll-target="#posible-aplicación-y-beneficios"><span class="header-section-number">5.2</span> Posible aplicación y beneficios</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Actividad 2: Modelos de clasificación</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autores/as</div>
+    <div class="quarto-title-meta-contents">
+             <p>Gabriel Castro </p>
+             <p>Leonardo Cortes </p>
+             <p>Karolina Cedeño </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">12 de enero de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="instalación-de-librerías-e-importación-de-dataset" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="instalación-de-librerías-e-importación-de-dataset"><span class="header-section-number">1</span> Instalación de librerías e importación de dataset</h2>
+<p>A continuación procedemos con la instalacion de paquetes requeridos para llevar a cabo nuestos analisis e implementacion de modelos ML.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("tidyverse")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("caret")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("forecast")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("fastDummies")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("rpart")</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("rpart.plot")</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fastDummies)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>teleco <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"C:/Users/gicr9/OneDrive/Desktop/UNIR/Análisis de Datos Masivos para el Negocio/Actividades/Actividad 2/datos_teleco_Act2_ADMN.csv"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Para conocer las diferentes tipos de variables que componen el set de datos utilizamos las funciones <code>str()</code> y <code>head()</code> .</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="false" href="">Estructura de los datos</a></li><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="true" href="">Vista previa de los datos</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(teleco)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [7,032 × 23] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ ...1                  : num [1:7032] 1 2 3 4 5 6 7 8 9 10 ...
+ $ ID_cliente            : chr [1:7032] "7590-VHVEG" "5575-GNVDE" "3668-QPYBK" "7795-CFOCW" ...
+ $ Sexo                  : chr [1:7032] "Female" "Male" "Male" "Male" ...
+ $ Jubilado              : num [1:7032] 0 0 0 0 0 0 0 0 0 0 ...
+ $ Socio                 : chr [1:7032] "Yes" "No" "No" "No" ...
+ $ Empleado              : chr [1:7032] "No" "No" "No" "No" ...
+ $ Meses_alta            : num [1:7032] 1 34 2 45 2 8 22 10 28 62 ...
+ $ Servicio_telefonico   : chr [1:7032] "No" "Yes" "Yes" "No" ...
+ $ Lineas_multiples      : chr [1:7032] "No phone service" "No" "No" "No phone service" ...
+ $ Servicio_Internet     : chr [1:7032] "DSL" "DSL" "DSL" "DSL" ...
+ $ Seguridad_Online      : chr [1:7032] "No" "Yes" "Yes" "Yes" ...
+ $ CopiaSeguridad_Online : chr [1:7032] "Yes" "No" "Yes" "No" ...
+ $ Proteccion_dispositivo: chr [1:7032] "No" "Yes" "No" "Yes" ...
+ $ Soporte_tecnico       : chr [1:7032] "No" "No" "No" "Yes" ...
+ $ Television_carta      : chr [1:7032] "No" "No" "No" "No" ...
+ $ Peliculas_carta       : chr [1:7032] "No" "No" "No" "No" ...
+ $ Contrato              : chr [1:7032] "Month-to-month" "One year" "Month-to-month" "One year" ...
+ $ Factura_digital       : chr [1:7032] "Yes" "No" "Yes" "No" ...
+ $ Metodo_pago           : chr [1:7032] "Electronic check" "Mailed check" "Mailed check" "Bank transfer (automatic)" ...
+ $ Gasto_mensual         : num [1:7032] 29.9 57 53.9 42.3 70.7 ...
+ $ Gasto_total           : num [1:7032] 29.9 1889.5 108.2 1840.8 151.7 ...
+ $ Abandono              : chr [1:7032] "No" "No" "Yes" "No" ...
+ $ meses_alta_cut        : chr [1:7032] "&lt;1" "18-42" "1-6" "42-60" ...
+ - attr(*, "spec")=
+  .. cols(
+  ..   ...1 = col_double(),
+  ..   ID_cliente = col_character(),
+  ..   Sexo = col_character(),
+  ..   Jubilado = col_double(),
+  ..   Socio = col_character(),
+  ..   Empleado = col_character(),
+  ..   Meses_alta = col_double(),
+  ..   Servicio_telefonico = col_character(),
+  ..   Lineas_multiples = col_character(),
+  ..   Servicio_Internet = col_character(),
+  ..   Seguridad_Online = col_character(),
+  ..   CopiaSeguridad_Online = col_character(),
+  ..   Proteccion_dispositivo = col_character(),
+  ..   Soporte_tecnico = col_character(),
+  ..   Television_carta = col_character(),
+  ..   Peliculas_carta = col_character(),
+  ..   Contrato = col_character(),
+  ..   Factura_digital = col_character(),
+  ..   Metodo_pago = col_character(),
+  ..   Gasto_mensual = col_double(),
+  ..   Gasto_total = col_double(),
+  ..   Abandono = col_character(),
+  ..   meses_alta_cut = col_character()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="active tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["...1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["ID_cliente"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Sexo"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Jubilado"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Socio"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Empleado"],"name":[6],"type":["chr"],"align":["left"]},{"label":["Meses_alta"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Servicio_telefonico"],"name":[8],"type":["chr"],"align":["left"]},{"label":["Lineas_multiples"],"name":[9],"type":["chr"],"align":["left"]},{"label":["Servicio_Internet"],"name":[10],"type":["chr"],"align":["left"]},{"label":["Seguridad_Online"],"name":[11],"type":["chr"],"align":["left"]},{"label":["CopiaSeguridad_Online"],"name":[12],"type":["chr"],"align":["left"]},{"label":["Proteccion_dispositivo"],"name":[13],"type":["chr"],"align":["left"]},{"label":["Soporte_tecnico"],"name":[14],"type":["chr"],"align":["left"]},{"label":["Television_carta"],"name":[15],"type":["chr"],"align":["left"]},{"label":["Peliculas_carta"],"name":[16],"type":["chr"],"align":["left"]},{"label":["Contrato"],"name":[17],"type":["chr"],"align":["left"]},{"label":["Factura_digital"],"name":[18],"type":["chr"],"align":["left"]},{"label":["Metodo_pago"],"name":[19],"type":["chr"],"align":["left"]},{"label":["Gasto_mensual"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["Gasto_total"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["Abandono"],"name":[22],"type":["chr"],"align":["left"]},{"label":["meses_alta_cut"],"name":[23],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"7590-VHVEG","3":"Female","4":"0","5":"Yes","6":"No","7":"1","8":"No","9":"No phone service","10":"DSL","11":"No","12":"Yes","13":"No","14":"No","15":"No","16":"No","17":"Month-to-month","18":"Yes","19":"Electronic check","20":"29.85","21":"29.85","22":"No","23":"<1"},{"1":"2","2":"5575-GNVDE","3":"Male","4":"0","5":"No","6":"No","7":"34","8":"Yes","9":"No","10":"DSL","11":"Yes","12":"No","13":"Yes","14":"No","15":"No","16":"No","17":"One year","18":"No","19":"Mailed check","20":"56.95","21":"1889.50","22":"No","23":"18-42"},{"1":"3","2":"3668-QPYBK","3":"Male","4":"0","5":"No","6":"No","7":"2","8":"Yes","9":"No","10":"DSL","11":"Yes","12":"Yes","13":"No","14":"No","15":"No","16":"No","17":"Month-to-month","18":"Yes","19":"Mailed check","20":"53.85","21":"108.15","22":"Yes","23":"1-6"},{"1":"4","2":"7795-CFOCW","3":"Male","4":"0","5":"No","6":"No","7":"45","8":"No","9":"No phone service","10":"DSL","11":"Yes","12":"No","13":"Yes","14":"Yes","15":"No","16":"No","17":"One year","18":"No","19":"Bank transfer (automatic)","20":"42.30","21":"1840.75","22":"No","23":"42-60"},{"1":"5","2":"9237-HQITU","3":"Female","4":"0","5":"No","6":"No","7":"2","8":"Yes","9":"No","10":"Fiber optic","11":"No","12":"No","13":"No","14":"No","15":"No","16":"No","17":"Month-to-month","18":"Yes","19":"Electronic check","20":"70.70","21":"151.65","22":"Yes","23":"1-6"},{"1":"6","2":"9305-CDSKC","3":"Female","4":"0","5":"No","6":"No","7":"8","8":"Yes","9":"Yes","10":"Fiber optic","11":"No","12":"No","13":"Yes","14":"No","15":"Yes","16":"Yes","17":"Month-to-month","18":"Yes","19":"Electronic check","20":"99.65","21":"820.50","22":"Yes","23":"6-18"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="evaluación-de-calidad-de-los-datos" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="evaluación-de-calidad-de-los-datos"><span class="header-section-number">2</span> Evaluación de calidad de los datos</h2>
+<p>Procedemos a evaluar los datos revisando las medidas de posición y dispersión de los mismos, en adición a los comprobar si existen datos nulos.</p>
+<section id="estadística-descriptiva-de-datos-numéricos" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="estadística-descriptiva-de-datos-numéricos"><span class="header-section-number">2.1</span> Estadística descriptiva de datos numéricos</h3>
+<p>Procedemos a utilizar diversas funciones para obtener medidas de tendencia central, posición y disperción con la finalidad de comprender el set de datos con el que estamos trabajando. Nos enfocaremos en la variable <strong>Meses_alta</strong>, ya que es la única variable numérica de las indicadas que utilizaremos para nuestro modelo de clasificación.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Medidas de posición y tendencia central</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">Filter</span>(is.numeric, teleco))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>      ...1         Jubilado        Meses_alta    Gasto_mensual   
+ Min.   :   1   Min.   :0.0000   Min.   : 1.00   Min.   : 18.25  
+ 1st Qu.:1764   1st Qu.:0.0000   1st Qu.: 9.00   1st Qu.: 35.59  
+ Median :3522   Median :0.0000   Median :29.00   Median : 70.35  
+ Mean   :3523   Mean   :0.1624   Mean   :32.42   Mean   : 64.80  
+ 3rd Qu.:5283   3rd Qu.:0.0000   3rd Qu.:55.00   3rd Qu.: 89.86  
+ Max.   :7043   Max.   :1.0000   Max.   :72.00   Max.   :118.75  
+  Gasto_total    
+ Min.   :  18.8  
+ 1st Qu.: 401.4  
+ Median :1397.5  
+ Mean   :2283.3  
+ 3rd Qu.:3794.7  
+ Max.   :8684.8  </code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Desviación Estandar</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Desviación Estandar:</span><span class="sc">\n</span><span class="st">"</span>,<span class="fu">sd</span>(teleco<span class="sc">$</span>Meses_alta))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Desviación Estandar:
+ 24.54526</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># coeficiente de variación</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>C_var_alta <span class="ot">&lt;-</span> <span class="fu">sd</span>(teleco<span class="sc">$</span>Meses_alta)<span class="sc">/</span><span class="fu">mean</span>(teleco<span class="sc">$</span>Meses_alta)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"coeficiente de variación:</span><span class="sc">\n</span><span class="st">"</span>,C_var_alta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>coeficiente de variación:
+ 0.7570607</code></pre>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Existen nulos en el dataset?</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Existen nulos en el dataset?</span><span class="sc">\n</span><span class="st">"</span>,<span class="fu">any</span>(<span class="fu">is.na</span>(teleco)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Existen nulos en el dataset?
+ FALSE</code></pre>
+</div>
+</div>
+<section id="apoyo-visual" class="level4" data-number="2.1.1">
+<h4 data-number="2.1.1" class="anchored" data-anchor-id="apoyo-visual"><span class="header-section-number">2.1.1</span> Apoyo visual</h4>
+<p><u>Histograma:</u></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> teleco,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Meses_alta, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> Abandono)) <span class="sc">+</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">4</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">boundary =</span> <span class="dv">1</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribución: Meses de Alta de Los Clientes"</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Meses de Alta"</span>, </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Cantidad de Clientes"</span>, </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Abandono?"</span>) <span class="sc">+</span> </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, </span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">to =</span> <span class="dv">73</span>, </span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">by =</span> <span class="dv">4</span> )) <span class="sc">+</span> </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span> </span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Actividad-2_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="interpretación-de-los-datos" class="level4" data-number="2.1.2">
+<h4 data-number="2.1.2" class="anchored" data-anchor-id="interpretación-de-los-datos"><span class="header-section-number">2.1.2</span> Interpretación de los datos</h4>
+<p>Al observar las estadísticas pertinentes a éste set de datos podemos inferir lo siguiente:</p>
+<ul>
+<li><p>La media y la mediana para <strong>Meses_Alta</strong> están relativamente cerca, lo que normalmente indica que los datos parecen tener una distribución relativamente, pero al ver su distancia de los extremos y corroborar con el histograma, notamos que en realidad tenemos una distribución bimodal/en forma de U.</p></li>
+<li><p>Los mayores grupos de clientes son aquellos con un alta de entre 1 a 5 meses y los de 69 a 73, siendo el primero de estos grupos el que abarca el mayor numero de clientes. Aparentemente el grupo con menor tiempo es tambén el más susceptible a abandonar el servicio a diferencia de los grupos de clientes más antiguos.</p></li>
+<li><p>Una desviación estandar de 24.25 y un coeficiente de variación de 0.76 nos deja claro que estamos ante datos bastante dispersos.</p></li>
+<li><p>No existen valores nulos en el dataset, lo que hasta el momento y en conjunto con las demás estadísticas nos indica una calidad de datos solida.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="selección-y-transformación-de-variables" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="selección-y-transformación-de-variables"><span class="header-section-number">3</span> Selección y transformación de variables</h2>
+<p>Tras haber evaluado la calidad del dataset, iniciamos el proceso a través del cual seleccionaremos y variables y utilizaremos técnicas como el “label encoding” y transformaremos variables para adecuarlas a los modelos de ML que serán utilizados más adelante.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="ot">&lt;-</span> teleco <span class="sc">%&gt;%</span> <span class="fu">select</span>(Contrato, Factura_digital, Servicio_Internet, Soporte_tecnico, CopiaSeguridad_Online, Television_carta, Meses_alta, Abandono)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco_short)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Contrato"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Factura_digital"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Servicio_Internet"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Soporte_tecnico"],"name":[4],"type":["chr"],"align":["left"]},{"label":["CopiaSeguridad_Online"],"name":[5],"type":["chr"],"align":["left"]},{"label":["Television_carta"],"name":[6],"type":["chr"],"align":["left"]},{"label":["Meses_alta"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["Abandono"],"name":[8],"type":["chr"],"align":["left"]}],"data":[{"1":"Month-to-month","2":"Yes","3":"DSL","4":"No","5":"Yes","6":"No","7":"1","8":"No"},{"1":"One year","2":"No","3":"DSL","4":"No","5":"No","6":"No","7":"34","8":"No"},{"1":"Month-to-month","2":"Yes","3":"DSL","4":"No","5":"Yes","6":"No","7":"2","8":"Yes"},{"1":"One year","2":"No","3":"DSL","4":"Yes","5":"No","6":"No","7":"45","8":"No"},{"1":"Month-to-month","2":"Yes","3":"Fiber optic","4":"No","5":"No","6":"No","7":"2","8":"Yes"},{"1":"Month-to-month","2":"Yes","3":"Fiber optic","4":"No","5":"No","6":"Yes","7":"8","8":"Yes"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Antes de proceder a transformar nuestras variables seleccionadas, queremos saber con cuantas categorias cuenta cada una y cuantas veces se repiten las mismas dentro de su respectivo campo.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Contrato</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Factura_digital</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Servicio_Internet</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Soporte_tecnico</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">CopiaSeguridad_Online</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false" href="">Television_carta</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false" href="">Meses_Alta</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-8" role="tab" aria-controls="tabset-2-8" aria-selected="false" href="">Abandono</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Contrato)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Contrato"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"Month-to-month","2":"3875"},{"1":"One year","2":"1472"},{"1":"Two year","2":"1685"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Factura_digital)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Factura_digital"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"2864"},{"1":"Yes","2":"4168"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Servicio_Internet)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Servicio_Internet"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"DSL","2":"2416"},{"1":"Fiber optic","2":"3096"},{"1":"No","2":"1520"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Soporte_tecnico)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Soporte_tecnico"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"3472"},{"1":"No internet service","2":"1520"},{"1":"Yes","2":"2040"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(CopiaSeguridad_Online)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["CopiaSeguridad_Online"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"3087"},{"1":"No internet service","2":"1520"},{"1":"Yes","2":"2425"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Television_carta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Television_carta"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"2809"},{"1":"No internet service","2":"1520"},{"1":"Yes","2":"2703"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Meses_alta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Meses_alta"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"613"},{"1":"2","2":"238"},{"1":"3","2":"200"},{"1":"4","2":"176"},{"1":"5","2":"133"},{"1":"6","2":"110"},{"1":"7","2":"131"},{"1":"8","2":"123"},{"1":"9","2":"119"},{"1":"10","2":"116"},{"1":"11","2":"99"},{"1":"12","2":"117"},{"1":"13","2":"109"},{"1":"14","2":"76"},{"1":"15","2":"99"},{"1":"16","2":"80"},{"1":"17","2":"87"},{"1":"18","2":"97"},{"1":"19","2":"73"},{"1":"20","2":"71"},{"1":"21","2":"63"},{"1":"22","2":"90"},{"1":"23","2":"85"},{"1":"24","2":"94"},{"1":"25","2":"79"},{"1":"26","2":"79"},{"1":"27","2":"72"},{"1":"28","2":"57"},{"1":"29","2":"72"},{"1":"30","2":"72"},{"1":"31","2":"65"},{"1":"32","2":"69"},{"1":"33","2":"64"},{"1":"34","2":"65"},{"1":"35","2":"88"},{"1":"36","2":"50"},{"1":"37","2":"65"},{"1":"38","2":"59"},{"1":"39","2":"56"},{"1":"40","2":"64"},{"1":"41","2":"70"},{"1":"42","2":"65"},{"1":"43","2":"65"},{"1":"44","2":"51"},{"1":"45","2":"61"},{"1":"46","2":"74"},{"1":"47","2":"68"},{"1":"48","2":"64"},{"1":"49","2":"66"},{"1":"50","2":"68"},{"1":"51","2":"68"},{"1":"52","2":"80"},{"1":"53","2":"70"},{"1":"54","2":"68"},{"1":"55","2":"64"},{"1":"56","2":"80"},{"1":"57","2":"65"},{"1":"58","2":"67"},{"1":"59","2":"60"},{"1":"60","2":"76"},{"1":"61","2":"76"},{"1":"62","2":"70"},{"1":"63","2":"72"},{"1":"64","2":"80"},{"1":"65","2":"76"},{"1":"66","2":"89"},{"1":"67","2":"98"},{"1":"68","2":"100"},{"1":"69","2":"95"},{"1":"70","2":"119"},{"1":"71","2":"170"},{"1":"72","2":"362"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-8-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Abandono)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Abandono"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"No","2":"5163"},{"1":"Yes","2":"1869"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Podemos observar quer tres de nuestras variables poseen una categoría redundante. “<strong>No internet service</strong>” Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple “<strong>No</strong>”.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="ot">&lt;-</span> teleco_short <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(Soporte_tecnico,</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>                                                 CopiaSeguridad_Online,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                                 Television_carta),</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                                               <span class="sc">~</span><span class="fu">ifelse</span>(.x <span class="sc">==</span> <span class="st">"No internet service"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                                       <span class="st">"No"</span>, .x)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><u><strong>Despues de cambios:</strong></u></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">Soporte_tecnico</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">CopiaSeguridad_online</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">Television_carta</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(Soporte_tecnico)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Soporte_tecnico"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"No"},{"1":"Yes"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(CopiaSeguridad_Online)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["CopiaSeguridad_Online"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"Yes"},{"1":"No"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(Television_carta)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Television_carta"],"name":[1],"type":["chr"],"align":["left"]}],"data":[{"1":"No"},{"1":"Yes"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Una vez hemos hecho estos cambios, procedemos con la creación de un set de datos al cual llamaremos “teleco_final”, el cual utilizaremos para entrenar y evaluar el desempeño de nuestros modelos de clasificación.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>teleco_final <span class="ot">&lt;-</span> <span class="fu">dummy_cols</span>(teleco_short,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">select_columns =</span> <span class="fu">c</span>(<span class="st">"Contrato"</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Servicio_Internet"</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Factura_digital"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Soporte_tecnico"</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"CopiaSeguridad_Online"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Television_carta"</span>,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Abandono"</span>),</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">remove_first_dummy =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>                           <span class="at">remove_selected_columns =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(teleco_final)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">"Abandono"</span> <span class="co">#Para mantener el nombre original"</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(teleco_final)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [7,032 × 10] (S3: tbl_df/tbl/data.frame)
+ $ Meses_alta                   : num [1:7032] 1 34 2 45 2 8 22 10 28 62 ...
+ $ Contrato_One year            : int [1:7032] 0 1 0 1 0 0 0 0 0 1 ...
+ $ Contrato_Two year            : int [1:7032] 0 0 0 0 0 0 0 0 0 0 ...
+ $ Servicio_Internet_Fiber optic: int [1:7032] 0 0 0 0 1 1 1 0 1 0 ...
+ $ Servicio_Internet_No         : int [1:7032] 0 0 0 0 0 0 0 0 0 0 ...
+ $ Factura_digital_Yes          : int [1:7032] 1 0 1 0 1 1 1 0 1 0 ...
+ $ Soporte_tecnico_Yes          : int [1:7032] 0 0 0 1 0 0 0 0 1 0 ...
+ $ CopiaSeguridad_Online_Yes    : int [1:7032] 1 0 1 0 0 0 1 0 0 1 ...
+ $ Television_carta_Yes         : int [1:7032] 0 0 0 0 0 1 1 0 1 0 ...
+ $ Abandono                     : int [1:7032] 0 0 1 0 1 1 0 0 1 0 ...</code></pre>
+</div>
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco_final)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["Meses_alta"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Contrato_One year"],"name":[2],"type":["int"],"align":["right"]},{"label":["Contrato_Two year"],"name":[3],"type":["int"],"align":["right"]},{"label":["Servicio_Internet_Fiber optic"],"name":[4],"type":["int"],"align":["right"]},{"label":["Servicio_Internet_No"],"name":[5],"type":["int"],"align":["right"]},{"label":["Factura_digital_Yes"],"name":[6],"type":["int"],"align":["right"]},{"label":["Soporte_tecnico_Yes"],"name":[7],"type":["int"],"align":["right"]},{"label":["CopiaSeguridad_Online_Yes"],"name":[8],"type":["int"],"align":["right"]},{"label":["Television_carta_Yes"],"name":[9],"type":["int"],"align":["right"]},{"label":["Abandono"],"name":[10],"type":["int"],"align":["right"]}],"data":[{"1":"1","2":"0","3":"0","4":"0","5":"0","6":"1","7":"0","8":"1","9":"0","10":"0"},{"1":"34","2":"1","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0"},{"1":"2","2":"0","3":"0","4":"0","5":"0","6":"1","7":"0","8":"1","9":"0","10":"1"},{"1":"45","2":"1","3":"0","4":"0","5":"0","6":"0","7":"1","8":"0","9":"0","10":"0"},{"1":"2","2":"0","3":"0","4":"1","5":"0","6":"1","7":"0","8":"0","9":"0","10":"1"},{"1":"8","2":"0","3":"0","4":"1","5":"0","6":"1","7":"0","8":"0","9":"1","10":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Al crear estas columnas el codigo genera una variable dummy por cada categoria existente, por lo cual si queremos que nuestro modelo pueda realizar calculos de manera correcta, procedemos a utilizar el <code>remove_first_dummy = TRUE</code>. Esto ayuda a eliminar redundancia. Para explicarlo de manera un poco más clara, tomemos como el ejemplo de la variable “Contrato”.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Mes a mes</th>
+<th>Un año</th>
+<th>Dos años</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>X</td>
+<td>X</td>
+<td><strong>O</strong></td>
+</tr>
+<tr class="even">
+<td>X</td>
+<td><strong>O</strong></td>
+<td>X</td>
+</tr>
+<tr class="odd">
+<td><strong>O</strong></td>
+<td>X</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
+<p>En este caso la “<strong>O”</strong> significa”si”, mientras que la “X” significa “no”. Al ver la tabla nos queda claro que cuando el cliente no tiene un contrato de uno o de dos años es porque tiene un contrato “mes a mes”. Si ya sabemos que la respuesta solo puede ser una de tres opciones, entonces para saber el tipo de contrato realmente basta con saber el estado “si” o “no” para dos de los tres tipos de contrato.</p>
+</section>
+<section id="modelos-de-clasificación" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="modelos-de-clasificación"><span class="header-section-number">4</span> Modelos de clasificación</h2>
+<p>A continuación utilizaremos una semilla y separaremos los datos con una distribución 80/20 para entrenamiento y prueba respectivamente mediante la función <code>createDaraPar</code>, para luego asignar dicha partición de datos en sus respectivas variables de entrenamiento y prueba (<strong>train</strong> y <strong>test</strong>).</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(teleco_final<span class="sc">$</span>Abandono, <span class="at">p=</span><span class="fl">0.8</span>, <span class="at">list=</span><span class="cn">FALSE</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> teleco_final[trainIndex, ]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> teleco_final[<span class="sc">-</span>trainIndex, ]</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">'Dimensiones de datos de entrenamiento:</span><span class="sc">\n</span><span class="st">'</span>,<span class="fu">dim</span>(train),<span class="st">'</span><span class="sc">\n</span><span class="st">'</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dimensiones de datos de entrenamiento:
+ 5626 10 </code></pre>
+</div>
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">'Dimensiones de datos de prueba:</span><span class="sc">\n</span><span class="st">'</span>,<span class="fu">dim</span>(test))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dimensiones de datos de prueba:
+ 1406 10</code></pre>
+</div>
+</div>
+<section id="modelo-de-regresión-logística" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="modelo-de-regresión-logística"><span class="header-section-number">4.1</span> Modelo de regresión logística</h3>
+<p>Para este modelo de regresión logística utilizamos las funsiones <code>glm()</code> y <code>summary()</code>. La primera nos construye el modelo con la ayuda de los datos de entrenamiento particionados anteriormente, mientras que la segunda nos ayuda a visualizar los coeficientes de cada variable involucrada para visualizar como afectan el modelo.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo de regresión logística</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>modelo_rlog <span class="ot">&lt;-</span> <span class="fu">glm</span>(Abandono <span class="sc">~</span> ., <span class="at">data=</span>train, <span class="at">family=</span><span class="st">'binomial'</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_rlog)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Abandono ~ ., family = "binomial", data = train)
+
+Coefficients:
+                                 Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                     -0.483095   0.089574  -5.393 6.92e-08 ***
+Meses_alta                      -0.032560   0.002324 -14.010  &lt; 2e-16 ***
+`Contrato_One year`             -0.830964   0.116255  -7.148 8.82e-13 ***
+`Contrato_Two year`             -1.629341   0.194354  -8.383  &lt; 2e-16 ***
+`Servicio_Internet_Fiber optic`  0.927113   0.083732  11.072  &lt; 2e-16 ***
+Servicio_Internet_No            -0.876422   0.135703  -6.458 1.06e-10 ***
+Factura_digital_Yes              0.405407   0.081208   4.992 5.97e-07 ***
+Soporte_tecnico_Yes             -0.392389   0.092776  -4.229 2.34e-05 ***
+CopiaSeguridad_Online_Yes       -0.078382   0.083667  -0.937    0.349    
+Television_carta_Yes             0.461031   0.081840   5.633 1.77e-08 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 6536.8  on 5625  degrees of freedom
+Residual deviance: 4821.5  on 5616  degrees of freedom
+AIC: 4841.5
+
+Number of Fisher Scoring iterations: 6</code></pre>
+</div>
+</div>
+<p>Los coeficientes nos indican que las variables que impactan en la decisión de abandonar (sí) son `“<strong>Servicio_Internet_Fiber optic”,“Factura_digital_Yes” y “Television_carta_Yes”</strong>; En otras palabras:</p>
+<ul>
+<li><p>¿Tiene el cliente servicio de internet de Fibra Optica?</p></li>
+<li><p>¿Recibe el cliente factura digital?</p></li>
+<li><p>¿Tiene el cliente servicio de televisión a la carta?</p></li>
+</ul>
+<p>Las tres variables poseen un p-valor menor 0.05, lo que nos indica que los resultados arrojados por el modelo son estadisticamente significativos, no producto del azar. Ésto ya nos da puntos de enfoque a los cuales podemos dirigir esfuerzos para prevenir el avandono. Ejemplos de dichos esfuerzos serían proporcionados más adelante segun el desempeño del modelo.</p>
+<section id="evaluación-del-modelo" class="level4" data-number="4.1.1">
+<h4 data-number="4.1.1" class="anchored" data-anchor-id="evaluación-del-modelo"><span class="header-section-number">4.1.1</span> Evaluación del modelo</h4>
+<p>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha insteractuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones sobre el conjunto de prueba</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_rlog, <span class="at">newdata=</span>test, <span class="at">type=</span><span class="st">'response'</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">round</span>(predicciones_rlog)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(predicciones_rlog)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>Abandono <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(test<span class="sc">$</span>Abandono)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>confusion_matrix <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predicciones_rlog, </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>                                    test<span class="sc">$</span>Abandono, </span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">positive =</span> <span class="st">"1"</span>)</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>confusion_matrix</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 952 168
+         1  91 195
+                                          
+               Accuracy : 0.8158          
+                 95% CI : (0.7945, 0.8357)
+    No Information Rate : 0.7418          
+    P-Value [Acc &gt; NIR] : 3.232e-11       
+                                          
+                  Kappa : 0.4834          
+                                          
+ Mcnemar's Test P-Value : 2.331e-06       
+                                          
+            Sensitivity : 0.5372          
+            Specificity : 0.9128          
+         Pos Pred Value : 0.6818          
+         Neg Pred Value : 0.8500          
+             Prevalence : 0.2582          
+         Detection Rate : 0.1387          
+   Detection Prevalence : 0.2034          
+      Balanced Accuracy : 0.7250          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Trás ejecutar el código para la evaluación de predicciones de nuestro modelo podemos observar:</p>
+<ul>
+<li><p><strong>La precisión (Accuracy)</strong> de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</p></li>
+<li><p><strong>El valor-P</strong> para la precisión se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</p></li>
+<li><p><strong>Especificidad (specificity) y sensibilidad (sensitivity)</strong> nos indican que éste modelo de regresión predice bien quién se mantiene leal a la empresa con apenas errores (<strong>0 = No, nuestra categoría mayoritaria</strong>), mientras que es más conservador al predecir los clientes que abandonan.</p></li>
+</ul>
+</section>
+</section>
+<section id="modelo-de-árbol" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="modelo-de-árbol"><span class="header-section-number">4.2</span> Modelo de Árbol</h3>
+<p>Similar a como hicimos con el modelo de regresión logística, El modelo de árbol es entrenado con los datos particionados anteriormente, pero adicionalmente en esta ocasión utilizamos la función <code>print()</code> para leer los resultados que nos arroja el mismo .</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Modelo de Arbol</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>modelo_arbol <span class="ot">&lt;-</span> <span class="fu">rpart</span>(Abandono <span class="sc">~</span> ., <span class="at">data=</span>train, <span class="at">method =</span> <span class="st">'class'</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(modelo_arbol)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>n= 5626 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+1) root 5626 1506 0 (0.7323143 0.2676857)  
+  2) Meses_alta&gt;=16.5 3591  565 0 (0.8426622 0.1573378) *
+  3) Meses_alta&lt; 16.5 2035  941 0 (0.5375921 0.4624079)  
+    6) Servicio_Internet_Fiber optic&lt; 0.5 1157  354 0 (0.6940363 0.3059637) *
+    7) Servicio_Internet_Fiber optic&gt;=0.5 878  291 1 (0.3314351 0.6685649) *</code></pre>
+</div>
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_arbol)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+rpart(formula = Abandono ~ ., data = train, method = "class")
+  n= 5626 
+
+          CP nsplit rel error    xerror       xstd
+1 0.09827357      0 1.0000000 1.0000000 0.02205140
+2 0.01000000      2 0.8034529 0.8067729 0.02049424
+
+Variable importance
+                   Meses_alta Servicio_Internet_Fiber optic 
+                           53                            29 
+         Television_carta_Yes          Servicio_Internet_No 
+                            6                             6 
+          Factura_digital_Yes 
+                            6 
+
+Node number 1: 5626 observations,    complexity param=0.09827357
+  predicted class=0  expected loss=0.2676857  P(node) =1
+    class counts:  4120  1506
+   probabilities: 0.732 0.268 
+  left son=2 (3591 obs) right son=3 (2035 obs)
+  Primary splits:
+      Meses_alta                    &lt; 16.5 to the right, improve=241.7738, (0 missing)
+      Contrato_Two year             &lt; 0.5  to the right, improve=205.0950, (0 missing)
+      Servicio_Internet_Fiber optic &lt; 0.5  to the left,  improve=190.6350, (0 missing)
+      Servicio_Internet_No          &lt; 0.5  to the right, improve=105.7530, (0 missing)
+      Factura_digital_Yes           &lt; 0.5  to the left,  improve= 77.7199, (0 missing)
+
+Node number 2: 3591 observations
+  predicted class=0  expected loss=0.1573378  P(node) =0.6382865
+    class counts:  3026   565
+   probabilities: 0.843 0.157 
+
+Node number 3: 2035 observations,    complexity param=0.09827357
+  predicted class=0  expected loss=0.4624079  P(node) =0.3617135
+    class counts:  1094   941
+   probabilities: 0.538 0.462 
+  left son=6 (1157 obs) right son=7 (878 obs)
+  Primary splits:
+      Servicio_Internet_Fiber optic &lt; 0.5  to the left,  improve=131.26590, (0 missing)
+      Servicio_Internet_No          &lt; 0.5  to the right, improve= 93.71814, (0 missing)
+      Factura_digital_Yes           &lt; 0.5  to the left,  improve= 57.71179, (0 missing)
+      Contrato_One year             &lt; 0.5  to the right, improve= 38.57633, (0 missing)
+      Meses_alta                    &lt; 2.5  to the right, improve= 38.29296, (0 missing)
+  Surrogate splits:
+      Television_carta_Yes      &lt; 0.5  to the left,  agree=0.661, adj=0.214, (0 split)
+      Servicio_Internet_No      &lt; 0.5  to the right, agree=0.659, adj=0.211, (0 split)
+      Factura_digital_Yes       &lt; 0.5  to the left,  agree=0.652, adj=0.194, (0 split)
+      CopiaSeguridad_Online_Yes &lt; 0.5  to the left,  agree=0.573, adj=0.010, (0 split)
+      Meses_alta                &lt; 15.5 to the left,  agree=0.572, adj=0.009, (0 split)
+
+Node number 6: 1157 observations
+  predicted class=0  expected loss=0.3059637  P(node) =0.2056523
+    class counts:   803   354
+   probabilities: 0.694 0.306 
+
+Node number 7: 878 observations
+  predicted class=1  expected loss=0.3314351  P(node) =0.1560611
+    class counts:   291   587
+   probabilities: 0.331 0.669 </code></pre>
+</div>
+</div>
+<section id="diagrama-de-árbol-de-decisión" class="level4" data-number="4.2.1">
+<h4 data-number="4.2.1" class="anchored" data-anchor-id="diagrama-de-árbol-de-decisión"><span class="header-section-number">4.2.1</span> Diagrama de Árbol de decisión</h4>
+<p>La implementación de <code>rpart.plot()</code> en éste caso nos ayuda a visualizar los resultados de nuestro modelo de árbol en un diagrama para su mayor compresión.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rpart.plot</span>(modelo_arbol,</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra =</span> <span class="dv">101</span>,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">under =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">main =</span> <span class="st">"Árbol de Decisión: Predicción de Abandono"</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">box.palette =</span> <span class="st">"GnYlRd"</span>) <span class="co">#rango de colores verde a rojo por abandono</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Actividad-2_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Nuestro modelo de árbol distingue dos variables como las de mayor importancia a la hora de predecir si los clientes de Teleco abandonarán sus servicios o permanecerán leales. Éstas variables son:</p>
+<ul>
+<li><p><strong>Meses_alta &gt;=17:</strong> En otras palabras, <strong>el cliente tiene antiguedad mayor o igual a 17 meses</strong>. De la respuesta ser “Sí/Yes” entonces el modelo pasa a la izquierda a 3591 clientes (el 64%) de los clientes. y de ellos el 564 abandona (16%). Este es nuestro nodo con menor porcentaje de abandono, indicándonos que mientras más tiempo tiene el cliente con el servicio. este es menos propenso a abandonar.</p></li>
+<li><p><strong>Servicios_internet_Fiber optic = 0:</strong> Para el 36% restante de clientes el enunciado sería, <strong>el cliente no tiene servicio de Fribra Optica.</strong> De la respuesta ser “No” estaríamos afirmando que el cliente de hecho si tiene el servicio y curiosamente éste es el grupo/nodo a pesar de representar solo el 16% de los clientes, también es el nodo con mayor tasa de abandono con 587 de 878 (67%). Como negocio convendría investigar exactamente que causa que tantos de los clientes con este servicio abandone.</p></li>
+</ul>
+</section>
+<section id="evaluación-del-modelo-1" class="level4" data-number="4.2.2">
+<h4 data-number="4.2.2" class="anchored" data-anchor-id="evaluación-del-modelo-1"><span class="header-section-number">4.2.2</span> Evaluación del modelo</h4>
+<p>Al igual que con el modelo de regresión logística, evaluamos el modelo de árbol generando predicciones con un set de datos con el que no fue entrenado y luego llevamos dichas predicciones a una matriz de confusión.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Código</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones sobre el conjunto de prueba</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>predicciones_arbol <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_arbol, <span class="at">newdata=</span>test, <span class="at">type=</span><span class="st">'class'</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>predicciones_arbol <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(predicciones_arbol)</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>confusion_matrix_arbol <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predicciones_arbol, </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>                                          test<span class="sc">$</span>Abandono,</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">positive =</span> <span class="st">"1"</span>)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>confusion_matrix_arbol</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+          Reference
+Prediction   0   1
+         0 986 210
+         1  57 153
+                                          
+               Accuracy : 0.8101          
+                 95% CI : (0.7886, 0.8303)
+    No Information Rate : 0.7418          
+    P-Value [Acc &gt; NIR] : 9.387e-10       
+                                          
+                  Kappa : 0.4253          
+                                          
+ Mcnemar's Test P-Value : &lt; 2.2e-16       
+                                          
+            Sensitivity : 0.4215          
+            Specificity : 0.9453          
+         Pos Pred Value : 0.7286          
+         Neg Pred Value : 0.8244          
+             Prevalence : 0.2582          
+         Detection Rate : 0.1088          
+   Detection Prevalence : 0.1494          
+      Balanced Accuracy : 0.6834          
+                                          
+       'Positive' Class : 1               
+                                          </code></pre>
+</div>
+</div>
+<p>Observaciones:</p>
+<ul>
+<li><p><strong>La precisión (Accuracy)</strong> de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya precisión fue de 0.8158.</p></li>
+<li><p>Al igual que en nuestro anterior modelo, <strong>el valor-P</strong> para la precisión se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</p></li>
+<li><p><strong>Especificidad (specificity) y sensibilidad (sensitivity)</strong> nos indican que éste modelo de árbol de decisión es aún mejor al predecir quién se mantiene leal a la empresa al obtener un 0.9453 en especificidad contra 0.9128 del modelo anterior; sin embargo es aún más conservador al predecir los clientes que abandonan al obtener solo un 0.4215 en sensibilidad contra 0.5372 en el modelo de regresión logística.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="elección-de-modelo-y-posible-aplicación" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="elección-de-modelo-y-posible-aplicación"><span class="header-section-number">5</span> Elección de modelo y posible aplicación</h2>
+<p>Ambos modelos están entrenados en un set de datos cuya variable dependiente está considerablemente desproporcionada, ya que la basta mayoría de los clientes de Teleco son leales. Ésto ocasiona que ambos modelos sean mucho mejores prediciendo que clientes se quedan, en lugar de predecir que clientes se abandonan la empresa. Existen técnicas en la ciencia de datos para solventar esta problemática; sin embargo, las mismas están fuera del alcance de lo requerido para ésta entrega</p>
+<section id="comparasión-de-modelos" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="comparasión-de-modelos"><span class="header-section-number">5.1</span> Comparasión de modelos</h3>
+<p>Tomando en cuenta las limitaciones anteriormente mencionadas procedemos a comparar los modelos de clasificación:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Métrica</strong></td>
+<td><strong>Modelo A (Regresión logística)</strong></td>
+<td><strong>Modelo B (Árbol)</strong></td>
+<td><strong>Ventaja para Teleco</strong></td>
+</tr>
+<tr class="even">
+<td><strong>Precisión (Accuracy)</strong></td>
+<td>0.8158</td>
+<td>0.8101</td>
+<td><strong>Modelo A:</strong> Mayor nivel de acierto global.</td>
+</tr>
+<tr class="odd">
+<td><strong>Sensibilidad</strong></td>
+<td>0.5372</td>
+<td>0.4215</td>
+<td><strong>Modelo A:</strong> Detecta un 11.5% más de clientes que se van.</td>
+</tr>
+<tr class="even">
+<td><strong>Especificidad</strong></td>
+<td>0.9128</td>
+<td>0.9453</td>
+<td><strong>Modelo B:</strong> Es más seguro identificando clientes leales.</td>
+</tr>
+<tr class="odd">
+<td><strong>Precisión (Pos Pred Value)</strong></td>
+<td>0.6818</td>
+<td>0.7286</td>
+<td><strong>Modelo B:</strong> Sus alertas de “abandono” son más certeras.</td>
+</tr>
+<tr class="even">
+<td><strong>Confianza (P-Value)</strong></td>
+<td>3.232e-11</td>
+<td>9.387e-10</td>
+<td><strong>Modelo A:</strong> Mayor solidez estadística frente al azar.</td>
+</tr>
+</tbody>
+</table>
+<p>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar decidido agregar a esta tabla de comparación la métrica de “pos(positive) pred(prediction) value” la cual mide la precisión de los aciertos al predecir “Sí/Yes”. Esto nos ayudará a enfocar un aspecto importante de la comparación.</p>
+<p>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</p>
+<ul>
+<li><p><strong>El modelo de árbol</strong> <strong>de decisiones</strong> con su <strong>pos pred value</strong> de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una <strong>sensibilidad</strong> de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.</p></li>
+<li><p><strong>El modelo de regresión logística</strong> posee un <strong>pos pred value</strong> de 0.6818 lo cual no lo sitúa muy distante del modelo de árbol, pero a la vez tiene una <strong>sensibilidad</strong> mayor con un 0.5372. Esto lo hace un modelo menos conservador a la hora de hacer predicciones de abandono, aunque la certeza de dichas predicciones sea ligeramente menor.</p></li>
+</ul>
+<p>Estos aspectos nos permiten corroborar algo que se puede apreciar en la matriz de confusión para cada modelo. El modelo de árbol de decisiones deja escapar a una mayor cantidad de clientes que el modelo de regresión logística con 210 falsos negativos contra 168 respectivamente. En la administración de servicios de telecomunicaciones, el costo de un <strong>falso negativo</strong> (no detectar a un cliente que se va) es considerablemente mayor al costo de un <strong>falso positivo</strong> (dar un beneficio de retención a un cliente que se quedaría).</p>
+<p>Al colocar en una balanza ofrecer un descuento como beneficio de retención a 34 clientes (la diferencia de falsos positivos entre ambos modelos) o perder el ingreso fijo proveniente de 42 clientes, la elección parece evidente, especialmente tomando en cuenta que el modelo de regresión logística ademas de todo lo mencionado cuenta con una confianza (P-value) más solida sin entrar en detalle en otras métricas como kappa que nos indican que los resultados obtenidos son en realidad producto de la inteligencia del modelo.</p>
+<p><strong>Modelo elegido:</strong> Regresión Logística (modelo A).</p>
+</section>
+<section id="posible-aplicación-y-beneficios" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="posible-aplicación-y-beneficios"><span class="header-section-number">5.2</span> Posible aplicación y beneficios</h3>
+<p>Con un modelo de clasificación como el elegido (Regresión logística), una empresa de telecomuniciones es capáz de emprender campañas de retención que pueden variar según se amerite, debido a la habilidad de detectar perfiles de clientes propensos al abandono.</p>
+<p>Si bien es cierto que Teleco podría tener conocimiento de que los clientes con menor antiguedad son más propensos a abandonar, sería un desperdicio de recursos el simplemente contactar a todo cliente con X cantidad de meses utilizando el servicio. Si en lugar de eso partimos de las clasificaciones realizadas por el modelo podremos ser mucho mas eficientes ya que 7 de cada 10 contactos hechos alcanzarían el objetivo (por su pos pred value de 0.6818). A continuación una lista de posibilidades:</p>
+<ul>
+<li><p><strong>Se obtiene una garantía estadística</strong> de que el equipo no está perdiendo el tiempo llamando a perfiles aleatorios, lo cual les permite planear.</p></li>
+<li><p>En lugar de enviar descuentos masivos a toda la base (<strong>lo cual erosiona el margen de beneficio</strong>), el departamento encargado de la campaña de retención utiliza el listado generado por el modelo.</p></li>
+<li><p>Al tener una especificidad tan alta, la empresa <strong>evita molestar al 91% de sus clientes leales</strong> con ofertas innecesarias, protegiendo así el Valor de Vida del Cliente (CLV).</p></li>
+<li><p>Es posible para la dirección <strong>tomar medidas correctivas anticipadas</strong> (como ajustes en la estrategia de precios o mejora de infraestructura en zonas específicas) antes de que el impacto financiero se refleje en el balance general.</p></li>
+</ul>
+<!-- -->
+
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Ejecutar el código</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb45" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Actividad 2: Modelos de clasificación"</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> </span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a><span class="co">  - "Gabriel Castro" </span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - "Leonardo Cortes"</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a><span class="co">  - "Karolina Cedeño"</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="an">language:</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="co">  author-title: "Autores"</span></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> es</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a><span class="an">theme:</span><span class="co"> "minty"</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2026-1-12"</span></span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a><span class="co">    df-print: paged</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: true</span></span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools:</span></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a><span class="co">      source: true</span></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a><span class="co">      toggle: false</span></span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-location: "left"</span></span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 4</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: true</span></span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a><span class="co">    smooth-scroll: true</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> visual</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb45-28"><a href="#cb45-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-29"><a href="#cb45-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Instalación de librerías e importación de dataset</span></span>
+<span id="cb45-30"><a href="#cb45-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-31"><a href="#cb45-31" aria-hidden="true" tabindex="-1"></a>A continuación procedemos con la instalacion de paquetes requeridos para llevar a cabo nuestos analisis e implementacion de modelos ML.</span>
+<span id="cb45-32"><a href="#cb45-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-35"><a href="#cb45-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-36"><a href="#cb45-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb45-37"><a href="#cb45-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb45-38"><a href="#cb45-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-39"><a href="#cb45-39" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("tidyverse")</span></span>
+<span id="cb45-40"><a href="#cb45-40" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("caret")</span></span>
+<span id="cb45-41"><a href="#cb45-41" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("forecast")</span></span>
+<span id="cb45-42"><a href="#cb45-42" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("fastDummies")</span></span>
+<span id="cb45-43"><a href="#cb45-43" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("rpart")</span></span>
+<span id="cb45-44"><a href="#cb45-44" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("rpart.plot")</span></span>
+<span id="cb45-45"><a href="#cb45-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-46"><a href="#cb45-46" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb45-47"><a href="#cb45-47" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb45-48"><a href="#cb45-48" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fastDummies)</span>
+<span id="cb45-49"><a href="#cb45-49" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
+<span id="cb45-50"><a href="#cb45-50" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb45-51"><a href="#cb45-51" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb45-52"><a href="#cb45-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-53"><a href="#cb45-53" aria-hidden="true" tabindex="-1"></a>teleco <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"C:/Users/gicr9/OneDrive/Desktop/UNIR/Análisis de Datos Masivos para el Negocio/Actividades/Actividad 2/datos_teleco_Act2_ADMN.csv"</span>)</span>
+<span id="cb45-54"><a href="#cb45-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-55"><a href="#cb45-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-56"><a href="#cb45-56" aria-hidden="true" tabindex="-1"></a>Para conocer las diferentes tipos de variables que componen el set de datos utilizamos las funciones <span class="in">`str()`</span> y <span class="in">`head()`</span> .</span>
+<span id="cb45-57"><a href="#cb45-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-58"><a href="#cb45-58" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb45-59"><a href="#cb45-59" aria-hidden="true" tabindex="-1"></a><span class="fu">## Estructura de los datos</span></span>
+<span id="cb45-60"><a href="#cb45-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-63"><a href="#cb45-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-64"><a href="#cb45-64" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(teleco)</span>
+<span id="cb45-65"><a href="#cb45-65" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-66"><a href="#cb45-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-67"><a href="#cb45-67" aria-hidden="true" tabindex="-1"></a><span class="fu">## Vista previa de los datos {.active}</span></span>
+<span id="cb45-68"><a href="#cb45-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-71"><a href="#cb45-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-72"><a href="#cb45-72" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco)</span>
+<span id="cb45-73"><a href="#cb45-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-74"><a href="#cb45-74" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb45-75"><a href="#cb45-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-76"><a href="#cb45-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluación de calidad de los datos</span></span>
+<span id="cb45-77"><a href="#cb45-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-78"><a href="#cb45-78" aria-hidden="true" tabindex="-1"></a>Procedemos a evaluar los datos revisando las medidas de posición y dispersión de los mismos, en adición a los comprobar si existen datos nulos.</span>
+<span id="cb45-79"><a href="#cb45-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-80"><a href="#cb45-80" aria-hidden="true" tabindex="-1"></a><span class="fu">### Estadística descriptiva de datos numéricos</span></span>
+<span id="cb45-81"><a href="#cb45-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-82"><a href="#cb45-82" aria-hidden="true" tabindex="-1"></a>Procedemos a utilizar diversas funciones para obtener medidas de tendencia central, posición y disperción con la finalidad de comprender el set de datos con el que estamos trabajando. Nos enfocaremos en la variable **Meses_alta**, ya que es la única variable numérica de las indicadas que utilizaremos para nuestro modelo de clasificación.</span>
+<span id="cb45-83"><a href="#cb45-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-86"><a href="#cb45-86" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-87"><a href="#cb45-87" aria-hidden="true" tabindex="-1"></a><span class="co">#Medidas de posición y tendencia central</span></span>
+<span id="cb45-88"><a href="#cb45-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-89"><a href="#cb45-89" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">Filter</span>(is.numeric, teleco))</span>
+<span id="cb45-90"><a href="#cb45-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-91"><a href="#cb45-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-94"><a href="#cb45-94" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-95"><a href="#cb45-95" aria-hidden="true" tabindex="-1"></a><span class="co">#Desviación Estandar</span></span>
+<span id="cb45-96"><a href="#cb45-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-97"><a href="#cb45-97" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Desviación Estandar:</span><span class="sc">\n</span><span class="st">"</span>,<span class="fu">sd</span>(teleco<span class="sc">$</span>Meses_alta))</span>
+<span id="cb45-98"><a href="#cb45-98" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-99"><a href="#cb45-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-102"><a href="#cb45-102" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-103"><a href="#cb45-103" aria-hidden="true" tabindex="-1"></a><span class="co"># coeficiente de variación</span></span>
+<span id="cb45-104"><a href="#cb45-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-105"><a href="#cb45-105" aria-hidden="true" tabindex="-1"></a>C_var_alta <span class="ot">&lt;-</span> <span class="fu">sd</span>(teleco<span class="sc">$</span>Meses_alta)<span class="sc">/</span><span class="fu">mean</span>(teleco<span class="sc">$</span>Meses_alta)</span>
+<span id="cb45-106"><a href="#cb45-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-107"><a href="#cb45-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-108"><a href="#cb45-108" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"coeficiente de variación:</span><span class="sc">\n</span><span class="st">"</span>,C_var_alta)</span>
+<span id="cb45-109"><a href="#cb45-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-110"><a href="#cb45-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-113"><a href="#cb45-113" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-114"><a href="#cb45-114" aria-hidden="true" tabindex="-1"></a><span class="co"># Existen nulos en el dataset?</span></span>
+<span id="cb45-115"><a href="#cb45-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-116"><a href="#cb45-116" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Existen nulos en el dataset?</span><span class="sc">\n</span><span class="st">"</span>,<span class="fu">any</span>(<span class="fu">is.na</span>(teleco)))</span>
+<span id="cb45-117"><a href="#cb45-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-118"><a href="#cb45-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-119"><a href="#cb45-119" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Apoyo visual</span></span>
+<span id="cb45-120"><a href="#cb45-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-121"><a href="#cb45-121" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Histograma:</span><span class="co">]</span>{.underline}</span>
+<span id="cb45-122"><a href="#cb45-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-125"><a href="#cb45-125" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-126"><a href="#cb45-126" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb45-127"><a href="#cb45-127" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> teleco,</span>
+<span id="cb45-128"><a href="#cb45-128" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Meses_alta, </span>
+<span id="cb45-129"><a href="#cb45-129" aria-hidden="true" tabindex="-1"></a>           <span class="at">fill =</span> Abandono)) <span class="sc">+</span> </span>
+<span id="cb45-130"><a href="#cb45-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">4</span>,</span>
+<span id="cb45-131"><a href="#cb45-131" aria-hidden="true" tabindex="-1"></a>                 <span class="at">boundary =</span> <span class="dv">1</span>,</span>
+<span id="cb45-132"><a href="#cb45-132" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"white"</span>,</span>
+<span id="cb45-133"><a href="#cb45-133" aria-hidden="true" tabindex="-1"></a>                 <span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
+<span id="cb45-134"><a href="#cb45-134" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribución: Meses de Alta de Los Clientes"</span>,</span>
+<span id="cb45-135"><a href="#cb45-135" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Meses de Alta"</span>, </span>
+<span id="cb45-136"><a href="#cb45-136" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Cantidad de Clientes"</span>, </span>
+<span id="cb45-137"><a href="#cb45-137" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> <span class="st">"Abandono?"</span>) <span class="sc">+</span> </span>
+<span id="cb45-138"><a href="#cb45-138" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">breaks =</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">1</span>, </span>
+<span id="cb45-139"><a href="#cb45-139" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">to =</span> <span class="dv">73</span>, </span>
+<span id="cb45-140"><a href="#cb45-140" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">by =</span> <span class="dv">4</span> )) <span class="sc">+</span> </span>
+<span id="cb45-141"><a href="#cb45-141" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span> </span>
+<span id="cb45-142"><a href="#cb45-142" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set2"</span>)</span>
+<span id="cb45-143"><a href="#cb45-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-144"><a href="#cb45-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-145"><a href="#cb45-145" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Interpretación de los datos</span></span>
+<span id="cb45-146"><a href="#cb45-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-147"><a href="#cb45-147" aria-hidden="true" tabindex="-1"></a>Al observar las estadísticas pertinentes a éste set de datos podemos inferir lo siguiente:</span>
+<span id="cb45-148"><a href="#cb45-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-149"><a href="#cb45-149" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>La media y la mediana para **Meses_Alta** están relativamente cerca, lo que normalmente indica que los datos parecen tener una distribución relativamente, pero al ver su distancia de los extremos y corroborar con el histograma, notamos que en realidad tenemos una distribución bimodal/en forma de U.</span>
+<span id="cb45-150"><a href="#cb45-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-151"><a href="#cb45-151" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Los mayores grupos de clientes son aquellos con un alta de entre 1 a 5 meses y los de 69 a 73, siendo el primero de estos grupos el que abarca el mayor numero de clientes. Aparentemente el grupo con menor tiempo es tambén el más susceptible a abandonar el servicio a diferencia de los grupos de clientes más antiguos.</span>
+<span id="cb45-152"><a href="#cb45-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-153"><a href="#cb45-153" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Una desviación estandar de 24.25 y un coeficiente de variación de 0.76 nos deja claro que estamos ante datos bastante dispersos.</span>
+<span id="cb45-154"><a href="#cb45-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-155"><a href="#cb45-155" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>No existen valores nulos en el dataset, lo que hasta el momento y en conjunto con las demás estadísticas nos indica una calidad de datos solida.</span>
+<span id="cb45-156"><a href="#cb45-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-157"><a href="#cb45-157" aria-hidden="true" tabindex="-1"></a><span class="fu">## Selección y transformación de variables</span></span>
+<span id="cb45-158"><a href="#cb45-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-159"><a href="#cb45-159" aria-hidden="true" tabindex="-1"></a>Tras haber evaluado la calidad del dataset, iniciamos el proceso a través del cual seleccionaremos y variables y utilizaremos técnicas como el "label encoding" y transformaremos variables para adecuarlas a los modelos de ML que serán utilizados más adelante.</span>
+<span id="cb45-160"><a href="#cb45-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-163"><a href="#cb45-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-164"><a href="#cb45-164" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="ot">&lt;-</span> teleco <span class="sc">%&gt;%</span> <span class="fu">select</span>(Contrato, Factura_digital, Servicio_Internet, Soporte_tecnico, CopiaSeguridad_Online, Television_carta, Meses_alta, Abandono)</span>
+<span id="cb45-165"><a href="#cb45-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-166"><a href="#cb45-166" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco_short)</span>
+<span id="cb45-167"><a href="#cb45-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-168"><a href="#cb45-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-169"><a href="#cb45-169" aria-hidden="true" tabindex="-1"></a>Antes de proceder a transformar nuestras variables seleccionadas, queremos saber con cuantas categorias cuenta cada una y cuantas veces se repiten las mismas dentro de su respectivo campo.</span>
+<span id="cb45-170"><a href="#cb45-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-171"><a href="#cb45-171" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb45-172"><a href="#cb45-172" aria-hidden="true" tabindex="-1"></a><span class="fu">## Contrato</span></span>
+<span id="cb45-173"><a href="#cb45-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-176"><a href="#cb45-176" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-177"><a href="#cb45-177" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Contrato)</span>
+<span id="cb45-178"><a href="#cb45-178" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-179"><a href="#cb45-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-180"><a href="#cb45-180" aria-hidden="true" tabindex="-1"></a><span class="fu">## Factura_digital</span></span>
+<span id="cb45-181"><a href="#cb45-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-184"><a href="#cb45-184" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-185"><a href="#cb45-185" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Factura_digital)</span>
+<span id="cb45-186"><a href="#cb45-186" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-187"><a href="#cb45-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-188"><a href="#cb45-188" aria-hidden="true" tabindex="-1"></a><span class="fu">## Servicio_Internet</span></span>
+<span id="cb45-189"><a href="#cb45-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-192"><a href="#cb45-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-193"><a href="#cb45-193" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Servicio_Internet)</span>
+<span id="cb45-194"><a href="#cb45-194" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-195"><a href="#cb45-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-196"><a href="#cb45-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Soporte_tecnico</span></span>
+<span id="cb45-197"><a href="#cb45-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-200"><a href="#cb45-200" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-201"><a href="#cb45-201" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Soporte_tecnico)</span>
+<span id="cb45-202"><a href="#cb45-202" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-203"><a href="#cb45-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-204"><a href="#cb45-204" aria-hidden="true" tabindex="-1"></a><span class="fu">## CopiaSeguridad_Online</span></span>
+<span id="cb45-205"><a href="#cb45-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-208"><a href="#cb45-208" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-209"><a href="#cb45-209" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(CopiaSeguridad_Online)</span>
+<span id="cb45-210"><a href="#cb45-210" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-211"><a href="#cb45-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-212"><a href="#cb45-212" aria-hidden="true" tabindex="-1"></a><span class="fu">## Television_carta</span></span>
+<span id="cb45-213"><a href="#cb45-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-216"><a href="#cb45-216" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-217"><a href="#cb45-217" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Television_carta)</span>
+<span id="cb45-218"><a href="#cb45-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-219"><a href="#cb45-219" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-220"><a href="#cb45-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-221"><a href="#cb45-221" aria-hidden="true" tabindex="-1"></a><span class="fu">## Meses_Alta</span></span>
+<span id="cb45-222"><a href="#cb45-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-225"><a href="#cb45-225" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-226"><a href="#cb45-226" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Meses_alta)</span>
+<span id="cb45-227"><a href="#cb45-227" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-228"><a href="#cb45-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-229"><a href="#cb45-229" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abandono</span></span>
+<span id="cb45-230"><a href="#cb45-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-233"><a href="#cb45-233" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-234"><a href="#cb45-234" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">count</span>(Abandono)</span>
+<span id="cb45-235"><a href="#cb45-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-236"><a href="#cb45-236" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb45-237"><a href="#cb45-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-238"><a href="#cb45-238" aria-hidden="true" tabindex="-1"></a>Podemos observar quer tres de nuestras variables poseen una categoría redundante. "**No internet service**" Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple "**No**".</span>
+<span id="cb45-239"><a href="#cb45-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-242"><a href="#cb45-242" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-243"><a href="#cb45-243" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="ot">&lt;-</span> teleco_short <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(Soporte_tecnico,</span>
+<span id="cb45-244"><a href="#cb45-244" aria-hidden="true" tabindex="-1"></a>                                                 CopiaSeguridad_Online,</span>
+<span id="cb45-245"><a href="#cb45-245" aria-hidden="true" tabindex="-1"></a>                                                 Television_carta),</span>
+<span id="cb45-246"><a href="#cb45-246" aria-hidden="true" tabindex="-1"></a>                                               <span class="sc">~</span><span class="fu">ifelse</span>(.x <span class="sc">==</span> <span class="st">"No internet service"</span>,</span>
+<span id="cb45-247"><a href="#cb45-247" aria-hidden="true" tabindex="-1"></a>                                                       <span class="st">"No"</span>, .x)))</span>
+<span id="cb45-248"><a href="#cb45-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-249"><a href="#cb45-249" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-250"><a href="#cb45-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-251"><a href="#cb45-251" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">**Despues de cambios:**</span><span class="co">]</span>{.underline}</span>
+<span id="cb45-252"><a href="#cb45-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-253"><a href="#cb45-253" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb45-254"><a href="#cb45-254" aria-hidden="true" tabindex="-1"></a><span class="fu">## Soporte_tecnico</span></span>
+<span id="cb45-255"><a href="#cb45-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-258"><a href="#cb45-258" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-259"><a href="#cb45-259" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(Soporte_tecnico)</span>
+<span id="cb45-260"><a href="#cb45-260" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-261"><a href="#cb45-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-262"><a href="#cb45-262" aria-hidden="true" tabindex="-1"></a><span class="fu">## CopiaSeguridad_online</span></span>
+<span id="cb45-263"><a href="#cb45-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-266"><a href="#cb45-266" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-267"><a href="#cb45-267" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(CopiaSeguridad_Online)</span>
+<span id="cb45-268"><a href="#cb45-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-269"><a href="#cb45-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-270"><a href="#cb45-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Television_carta</span></span>
+<span id="cb45-271"><a href="#cb45-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-274"><a href="#cb45-274" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-275"><a href="#cb45-275" aria-hidden="true" tabindex="-1"></a>teleco_short <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(Television_carta)</span>
+<span id="cb45-276"><a href="#cb45-276" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-277"><a href="#cb45-277" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb45-278"><a href="#cb45-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-279"><a href="#cb45-279" aria-hidden="true" tabindex="-1"></a>Una vez hemos hecho estos cambios, procedemos con la creación de un set de datos al cual llamaremos "teleco_final", el cual utilizaremos para entrenar y evaluar el desempeño de nuestros modelos de clasificación.</span>
+<span id="cb45-280"><a href="#cb45-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-283"><a href="#cb45-283" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-284"><a href="#cb45-284" aria-hidden="true" tabindex="-1"></a>teleco_final <span class="ot">&lt;-</span> <span class="fu">dummy_cols</span>(teleco_short,</span>
+<span id="cb45-285"><a href="#cb45-285" aria-hidden="true" tabindex="-1"></a>                           <span class="at">select_columns =</span> <span class="fu">c</span>(<span class="st">"Contrato"</span>,</span>
+<span id="cb45-286"><a href="#cb45-286" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Servicio_Internet"</span>,</span>
+<span id="cb45-287"><a href="#cb45-287" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Factura_digital"</span>,</span>
+<span id="cb45-288"><a href="#cb45-288" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Soporte_tecnico"</span>,</span>
+<span id="cb45-289"><a href="#cb45-289" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"CopiaSeguridad_Online"</span>,</span>
+<span id="cb45-290"><a href="#cb45-290" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Television_carta"</span>,</span>
+<span id="cb45-291"><a href="#cb45-291" aria-hidden="true" tabindex="-1"></a>                                              <span class="st">"Abandono"</span>),</span>
+<span id="cb45-292"><a href="#cb45-292" aria-hidden="true" tabindex="-1"></a>                           <span class="at">remove_first_dummy =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb45-293"><a href="#cb45-293" aria-hidden="true" tabindex="-1"></a>                           <span class="at">remove_selected_columns =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb45-294"><a href="#cb45-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-295"><a href="#cb45-295" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(teleco_final)[<span class="dv">10</span>] <span class="ot">&lt;-</span> <span class="st">"Abandono"</span> <span class="co">#Para mantener el nombre original"</span></span>
+<span id="cb45-296"><a href="#cb45-296" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(teleco_final)</span>
+<span id="cb45-297"><a href="#cb45-297" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(teleco_final)</span>
+<span id="cb45-298"><a href="#cb45-298" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-299"><a href="#cb45-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-300"><a href="#cb45-300" aria-hidden="true" tabindex="-1"></a>Al crear estas columnas el codigo genera una variable dummy por cada categoria existente, por lo cual si queremos que nuestro modelo pueda realizar calculos de manera correcta, procedemos a utilizar el <span class="in">`remove_first_dummy = TRUE`</span>. Esto ayuda a eliminar redundancia. Para explicarlo de manera un poco más clara, tomemos como el ejemplo de la variable "Contrato".</span>
+<span id="cb45-301"><a href="#cb45-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-302"><a href="#cb45-302" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mes a mes <span class="pp">|</span> Un año <span class="pp">|</span> Dos años <span class="pp">|</span></span>
+<span id="cb45-303"><a href="#cb45-303" aria-hidden="true" tabindex="-1"></a><span class="pp">|-----------|--------|----------|</span></span>
+<span id="cb45-304"><a href="#cb45-304" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> X         <span class="pp">|</span> X      <span class="pp">|</span> **O**    <span class="pp">|</span></span>
+<span id="cb45-305"><a href="#cb45-305" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> X         <span class="pp">|</span> **O**  <span class="pp">|</span> X        <span class="pp">|</span></span>
+<span id="cb45-306"><a href="#cb45-306" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **O**     <span class="pp">|</span> X      <span class="pp">|</span> X        <span class="pp">|</span></span>
+<span id="cb45-307"><a href="#cb45-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-308"><a href="#cb45-308" aria-hidden="true" tabindex="-1"></a>En este caso la "**O"** significa "si", mientras que la "X" significa "no". Al ver la tabla nos queda claro que cuando el cliente no tiene un contrato de uno o de dos años es porque tiene un contrato "mes a mes". Si ya sabemos que la respuesta solo puede ser una de tres opciones, entonces para saber el tipo de contrato realmente basta con saber el estado "si" o "no" para dos de los tres tipos de contrato.</span>
+<span id="cb45-309"><a href="#cb45-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-310"><a href="#cb45-310" aria-hidden="true" tabindex="-1"></a><span class="fu">## Modelos de clasificación</span></span>
+<span id="cb45-311"><a href="#cb45-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-312"><a href="#cb45-312" aria-hidden="true" tabindex="-1"></a>A continuación utilizaremos una semilla y separaremos los datos con una distribución 80/20 para entrenamiento y prueba respectivamente mediante la función <span class="in">`createDaraPar`</span>, para luego asignar dicha partición de datos en sus respectivas variables de entrenamiento y prueba (**train** y **test**).</span>
+<span id="cb45-313"><a href="#cb45-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-316"><a href="#cb45-316" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-317"><a href="#cb45-317" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb45-318"><a href="#cb45-318" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(teleco_final<span class="sc">$</span>Abandono, <span class="at">p=</span><span class="fl">0.8</span>, <span class="at">list=</span><span class="cn">FALSE</span>)</span>
+<span id="cb45-319"><a href="#cb45-319" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> teleco_final[trainIndex, ]</span>
+<span id="cb45-320"><a href="#cb45-320" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> teleco_final[<span class="sc">-</span>trainIndex, ]</span>
+<span id="cb45-321"><a href="#cb45-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-322"><a href="#cb45-322" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">'Dimensiones de datos de entrenamiento:</span><span class="sc">\n</span><span class="st">'</span>,<span class="fu">dim</span>(train),<span class="st">'</span><span class="sc">\n</span><span class="st">'</span>)</span>
+<span id="cb45-323"><a href="#cb45-323" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">'Dimensiones de datos de prueba:</span><span class="sc">\n</span><span class="st">'</span>,<span class="fu">dim</span>(test))</span>
+<span id="cb45-324"><a href="#cb45-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-325"><a href="#cb45-325" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-326"><a href="#cb45-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-327"><a href="#cb45-327" aria-hidden="true" tabindex="-1"></a><span class="fu">### Modelo de regresión logística</span></span>
+<span id="cb45-328"><a href="#cb45-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-329"><a href="#cb45-329" aria-hidden="true" tabindex="-1"></a>Para este modelo de regresión logística utilizamos las funsiones <span class="in">`glm()`</span> y <span class="in">`summary()`</span>. La primera nos construye el modelo con la ayuda de los datos de entrenamiento particionados anteriormente, mientras que la segunda nos ayuda a visualizar los coeficientes de cada variable involucrada para visualizar como afectan el modelo.</span>
+<span id="cb45-330"><a href="#cb45-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-333"><a href="#cb45-333" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-334"><a href="#cb45-334" aria-hidden="true" tabindex="-1"></a><span class="co"># Modelo de regresión logística</span></span>
+<span id="cb45-335"><a href="#cb45-335" aria-hidden="true" tabindex="-1"></a>modelo_rlog <span class="ot">&lt;-</span> <span class="fu">glm</span>(Abandono <span class="sc">~</span> ., <span class="at">data=</span>train, <span class="at">family=</span><span class="st">'binomial'</span>)</span>
+<span id="cb45-336"><a href="#cb45-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-337"><a href="#cb45-337" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_rlog)</span>
+<span id="cb45-338"><a href="#cb45-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-339"><a href="#cb45-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-340"><a href="#cb45-340" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-341"><a href="#cb45-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-342"><a href="#cb45-342" aria-hidden="true" tabindex="-1"></a>Los coeficientes nos indican que las variables que impactan en la decisión de abandonar (sí) son <span class="sc">\`</span>"**Servicio_Internet_Fiber optic","Factura_digital_Yes" y "Television_carta_Yes"**; En otras palabras:</span>
+<span id="cb45-343"><a href="#cb45-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-344"><a href="#cb45-344" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>¿Tiene el cliente servicio de internet de Fibra Optica?</span>
+<span id="cb45-345"><a href="#cb45-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-346"><a href="#cb45-346" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>¿Recibe el cliente factura digital?</span>
+<span id="cb45-347"><a href="#cb45-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-348"><a href="#cb45-348" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>¿Tiene el cliente servicio de televisión a la carta?</span>
+<span id="cb45-349"><a href="#cb45-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-350"><a href="#cb45-350" aria-hidden="true" tabindex="-1"></a>Las tres variables poseen un p-valor menor 0.05, lo que nos indica que los resultados arrojados por el modelo son estadisticamente significativos, no producto del azar. Ésto ya nos da puntos de enfoque a los cuales podemos dirigir esfuerzos para prevenir el avandono. Ejemplos de dichos esfuerzos serían proporcionados más adelante segun el desempeño del modelo.</span>
+<span id="cb45-351"><a href="#cb45-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-352"><a href="#cb45-352" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Evaluación del modelo</span></span>
+<span id="cb45-353"><a href="#cb45-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-354"><a href="#cb45-354" aria-hidden="true" tabindex="-1"></a>Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha insteractuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.</span>
+<span id="cb45-355"><a href="#cb45-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-358"><a href="#cb45-358" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-359"><a href="#cb45-359" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones sobre el conjunto de prueba</span></span>
+<span id="cb45-360"><a href="#cb45-360" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_rlog, <span class="at">newdata=</span>test, <span class="at">type=</span><span class="st">'response'</span>)</span>
+<span id="cb45-361"><a href="#cb45-361" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">round</span>(predicciones_rlog)</span>
+<span id="cb45-362"><a href="#cb45-362" aria-hidden="true" tabindex="-1"></a>predicciones_rlog <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(predicciones_rlog)</span>
+<span id="cb45-363"><a href="#cb45-363" aria-hidden="true" tabindex="-1"></a>test<span class="sc">$</span>Abandono <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(test<span class="sc">$</span>Abandono)</span>
+<span id="cb45-364"><a href="#cb45-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-365"><a href="#cb45-365" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb45-366"><a href="#cb45-366" aria-hidden="true" tabindex="-1"></a>confusion_matrix <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predicciones_rlog, </span>
+<span id="cb45-367"><a href="#cb45-367" aria-hidden="true" tabindex="-1"></a>                                    test<span class="sc">$</span>Abandono, </span>
+<span id="cb45-368"><a href="#cb45-368" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">positive =</span> <span class="st">"1"</span>)</span>
+<span id="cb45-369"><a href="#cb45-369" aria-hidden="true" tabindex="-1"></a>confusion_matrix</span>
+<span id="cb45-370"><a href="#cb45-370" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-371"><a href="#cb45-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-372"><a href="#cb45-372" aria-hidden="true" tabindex="-1"></a>Trás ejecutar el código para la evaluación de predicciones de nuestro modelo podemos observar:</span>
+<span id="cb45-373"><a href="#cb45-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-374"><a href="#cb45-374" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La precisión (Accuracy)** de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</span>
+<span id="cb45-375"><a href="#cb45-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-376"><a href="#cb45-376" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El valor-P** para la precisión se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</span>
+<span id="cb45-377"><a href="#cb45-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-378"><a href="#cb45-378" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de regresión predice bien quién se mantiene leal a la empresa con apenas errores (**0 = No, nuestra categoría mayoritaria**), mientras que es más conservador al predecir los clientes que abandonan.</span>
+<span id="cb45-379"><a href="#cb45-379" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-380"><a href="#cb45-380" aria-hidden="true" tabindex="-1"></a><span class="fu">### Modelo de Árbol</span></span>
+<span id="cb45-381"><a href="#cb45-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-382"><a href="#cb45-382" aria-hidden="true" tabindex="-1"></a>Similar a como hicimos con el modelo de regresión logística, El modelo de árbol es entrenado con los datos particionados anteriormente, pero adicionalmente en esta ocasión utilizamos la función <span class="in">`print()`</span> para leer los resultados que nos arroja el mismo .</span>
+<span id="cb45-383"><a href="#cb45-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-386"><a href="#cb45-386" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-387"><a href="#cb45-387" aria-hidden="true" tabindex="-1"></a><span class="co">#Modelo de Arbol</span></span>
+<span id="cb45-388"><a href="#cb45-388" aria-hidden="true" tabindex="-1"></a>modelo_arbol <span class="ot">&lt;-</span> <span class="fu">rpart</span>(Abandono <span class="sc">~</span> ., <span class="at">data=</span>train, <span class="at">method =</span> <span class="st">'class'</span>)</span>
+<span id="cb45-389"><a href="#cb45-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-390"><a href="#cb45-390" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(modelo_arbol)</span>
+<span id="cb45-391"><a href="#cb45-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-392"><a href="#cb45-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-393"><a href="#cb45-393" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(modelo_arbol)</span>
+<span id="cb45-394"><a href="#cb45-394" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-395"><a href="#cb45-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-396"><a href="#cb45-396" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Diagrama de Árbol de decisión</span></span>
+<span id="cb45-397"><a href="#cb45-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-398"><a href="#cb45-398" aria-hidden="true" tabindex="-1"></a>La implementación de <span class="in">`rpart.plot()`</span> en éste caso nos ayuda a visualizar los resultados de nuestro modelo de árbol en un diagrama para su mayor compresión.</span>
+<span id="cb45-399"><a href="#cb45-399" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-402"><a href="#cb45-402" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-403"><a href="#cb45-403" aria-hidden="true" tabindex="-1"></a><span class="fu">rpart.plot</span>(modelo_arbol,</span>
+<span id="cb45-404"><a href="#cb45-404" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra =</span> <span class="dv">101</span>,</span>
+<span id="cb45-405"><a href="#cb45-405" aria-hidden="true" tabindex="-1"></a>           <span class="at">under =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb45-406"><a href="#cb45-406" aria-hidden="true" tabindex="-1"></a>           <span class="at">main =</span> <span class="st">"Árbol de Decisión: Predicción de Abandono"</span>,</span>
+<span id="cb45-407"><a href="#cb45-407" aria-hidden="true" tabindex="-1"></a>           <span class="at">box.palette =</span> <span class="st">"GnYlRd"</span>) <span class="co">#rango de colores verde a rojo por abandono</span></span>
+<span id="cb45-408"><a href="#cb45-408" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-409"><a href="#cb45-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-410"><a href="#cb45-410" aria-hidden="true" tabindex="-1"></a>Nuestro modelo de árbol distingue dos variables como las de mayor importancia a la hora de predecir si los clientes de Teleco abandonarán sus servicios o permanecerán leales. Éstas variables son:</span>
+<span id="cb45-411"><a href="#cb45-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-412"><a href="#cb45-412" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Meses_alta \&gt;=17:** En otras palabras, **el cliente tiene antiguedad mayor o igual a 17 meses**. De la respuesta ser "Sí/Yes" entonces el modelo pasa a la izquierda a 3591 clientes (el 64%) de los clientes. y de ellos el 564 abandona (16%). Este es nuestro nodo con menor porcentaje de abandono, indicándonos que mientras más tiempo tiene el cliente con el servicio. este es menos propenso a abandonar.</span>
+<span id="cb45-413"><a href="#cb45-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-414"><a href="#cb45-414" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Servicios_internet_Fiber optic = 0:** Para el 36% restante de clientes el enunciado sería, **el cliente no tiene servicio de Fribra Optica.** De la respuesta ser "No" estaríamos afirmando que el cliente de hecho si tiene el servicio y curiosamente éste es el grupo/nodo a pesar de representar solo el 16% de los clientes, también es el nodo con mayor tasa de abandono con 587 de 878 (67%). Como negocio convendría investigar exactamente que causa que tantos de los clientes con este servicio abandone.</span>
+<span id="cb45-415"><a href="#cb45-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-416"><a href="#cb45-416" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Evaluación del modelo</span></span>
+<span id="cb45-417"><a href="#cb45-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-418"><a href="#cb45-418" aria-hidden="true" tabindex="-1"></a>Al igual que con el modelo de regresión logística, evaluamos el modelo de árbol generando predicciones con un set de datos con el que no fue entrenado y luego llevamos dichas predicciones a una matriz de confusión.</span>
+<span id="cb45-419"><a href="#cb45-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-422"><a href="#cb45-422" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb45-423"><a href="#cb45-423" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicciones sobre el conjunto de prueba</span></span>
+<span id="cb45-424"><a href="#cb45-424" aria-hidden="true" tabindex="-1"></a>predicciones_arbol <span class="ot">&lt;-</span> <span class="fu">predict</span>(modelo_arbol, <span class="at">newdata=</span>test, <span class="at">type=</span><span class="st">'class'</span>)</span>
+<span id="cb45-425"><a href="#cb45-425" aria-hidden="true" tabindex="-1"></a>predicciones_arbol <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(predicciones_arbol)</span>
+<span id="cb45-426"><a href="#cb45-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-427"><a href="#cb45-427" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de confusión</span></span>
+<span id="cb45-428"><a href="#cb45-428" aria-hidden="true" tabindex="-1"></a>confusion_matrix_arbol <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(predicciones_arbol, </span>
+<span id="cb45-429"><a href="#cb45-429" aria-hidden="true" tabindex="-1"></a>                                          test<span class="sc">$</span>Abandono,</span>
+<span id="cb45-430"><a href="#cb45-430" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">positive =</span> <span class="st">"1"</span>)</span>
+<span id="cb45-431"><a href="#cb45-431" aria-hidden="true" tabindex="-1"></a>confusion_matrix_arbol</span>
+<span id="cb45-432"><a href="#cb45-432" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb45-433"><a href="#cb45-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-434"><a href="#cb45-434" aria-hidden="true" tabindex="-1"></a>Observaciones:</span>
+<span id="cb45-435"><a href="#cb45-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-436"><a href="#cb45-436" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La precisión (Accuracy)** de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya precisión fue de 0.8158.</span>
+<span id="cb45-437"><a href="#cb45-437" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-438"><a href="#cb45-438" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Al igual que en nuestro anterior modelo, **el valor-P** para la precisión se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</span>
+<span id="cb45-439"><a href="#cb45-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-440"><a href="#cb45-440" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de árbol de decisión es aún mejor al predecir quién se mantiene leal a la empresa al obtener un 0.9453 en especificidad contra 0.9128 del modelo anterior; sin embargo es aún más conservador al predecir los clientes que abandonan al obtener solo un 0.4215 en sensibilidad contra 0.5372 en el modelo de regresión logística.</span>
+<span id="cb45-441"><a href="#cb45-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-442"><a href="#cb45-442" aria-hidden="true" tabindex="-1"></a><span class="fu">## Elección de modelo y posible aplicación</span></span>
+<span id="cb45-443"><a href="#cb45-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-444"><a href="#cb45-444" aria-hidden="true" tabindex="-1"></a>Ambos modelos están entrenados en un set de datos cuya variable dependiente está considerablemente desproporcionada, ya que la basta mayoría de los clientes de Teleco son leales. Ésto ocasiona que ambos modelos sean mucho mejores prediciendo que clientes se quedan, en lugar de predecir que clientes se abandonan la empresa. Existen técnicas en la ciencia de datos para solventar esta problemática; sin embargo, las mismas están fuera del alcance de lo requerido para ésta entrega</span>
+<span id="cb45-445"><a href="#cb45-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-446"><a href="#cb45-446" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparasión de modelos</span></span>
+<span id="cb45-447"><a href="#cb45-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-448"><a href="#cb45-448" aria-hidden="true" tabindex="-1"></a>Tomando en cuenta las limitaciones anteriormente mencionadas procedemos a comparar los modelos de clasificación:</span>
+<span id="cb45-449"><a href="#cb45-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-450"><a href="#cb45-450" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span></span>
+<span id="cb45-451"><a href="#cb45-451" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------|------------------|------------------|------------------|</span></span>
+<span id="cb45-452"><a href="#cb45-452" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Métrica** | **Modelo A (Regresión logística)** | **Modelo B (Árbol)** | **Ventaja para Teleco** <span class="pp">|</span></span>
+<span id="cb45-453"><a href="#cb45-453" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Precisión (Accuracy)** | 0.8158 | 0.8101 | **Modelo A:** Mayor nivel de acierto global. <span class="pp">|</span></span>
+<span id="cb45-454"><a href="#cb45-454" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Sensibilidad** | 0.5372 | 0.4215 | **Modelo A:** Detecta un 11.5% más de clientes que se van. <span class="pp">|</span></span>
+<span id="cb45-455"><a href="#cb45-455" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Especificidad** | 0.9128 | 0.9453 | **Modelo B:** Es más seguro identificando clientes leales. <span class="pp">|</span></span>
+<span id="cb45-456"><a href="#cb45-456" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Precisión (Pos Pred Value)** | 0.6818 | 0.7286 | **Modelo B:** Sus alertas de "abandono" son más certeras. <span class="pp">|</span></span>
+<span id="cb45-457"><a href="#cb45-457" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Confianza (P-Value)** | 3.232e-11 | 9.387e-10 | **Modelo A:** Mayor solidez estadística frente al azar. <span class="pp">|</span></span>
+<span id="cb45-458"><a href="#cb45-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-459"><a href="#cb45-459" aria-hidden="true" tabindex="-1"></a>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar decidido agregar a esta tabla de comparación la métrica de "pos(positive) pred(prediction) value" la cual mide la precisión de los aciertos al predecir "Sí/Yes". Esto nos ayudará a enfocar un aspecto importante de la comparación.</span>
+<span id="cb45-460"><a href="#cb45-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-461"><a href="#cb45-461" aria-hidden="true" tabindex="-1"></a>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</span>
+<span id="cb45-462"><a href="#cb45-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-463"><a href="#cb45-463" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El modelo de árbol** **de decisiones** con su **pos pred value** de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una **sensibilidad** de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.</span>
+<span id="cb45-464"><a href="#cb45-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-465"><a href="#cb45-465" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El modelo de regresión logística** posee un **pos pred value** de 0.6818 lo cual no lo sitúa muy distante del modelo de árbol, pero a la vez tiene una **sensibilidad** mayor con un 0.5372. Esto lo hace un modelo menos conservador a la hora de hacer predicciones de abandono, aunque la certeza de dichas predicciones sea ligeramente menor.</span>
+<span id="cb45-466"><a href="#cb45-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-467"><a href="#cb45-467" aria-hidden="true" tabindex="-1"></a>Estos aspectos nos permiten corroborar algo que se puede apreciar en la matriz de confusión para cada modelo. El modelo de árbol de decisiones deja escapar a una mayor cantidad de clientes que el modelo de regresión logística con 210 falsos negativos contra 168 respectivamente. En la administración de servicios de telecomunicaciones, el costo de un **falso negativo** (no detectar a un cliente que se va) es considerablemente mayor al costo de un **falso positivo** (dar un beneficio de retención a un cliente que se quedaría).</span>
+<span id="cb45-468"><a href="#cb45-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-469"><a href="#cb45-469" aria-hidden="true" tabindex="-1"></a>Al colocar en una balanza ofrecer un descuento como beneficio de retención a 34 clientes (la diferencia de falsos positivos entre ambos modelos) o perder el ingreso fijo proveniente de 42 clientes, la elección parece evidente, especialmente tomando en cuenta que el modelo de regresión logística ademas de todo lo mencionado cuenta con una confianza (P-value) más solida sin entrar en detalle en otras métricas como kappa que nos indican que los resultados obtenidos son en realidad producto de la inteligencia del modelo.</span>
+<span id="cb45-470"><a href="#cb45-470" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-471"><a href="#cb45-471" aria-hidden="true" tabindex="-1"></a>**Modelo elegido:** Regresión Logística (modelo A).</span>
+<span id="cb45-472"><a href="#cb45-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-473"><a href="#cb45-473" aria-hidden="true" tabindex="-1"></a><span class="fu">### Posible aplicación y beneficios</span></span>
+<span id="cb45-474"><a href="#cb45-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-475"><a href="#cb45-475" aria-hidden="true" tabindex="-1"></a>Con un modelo de clasificación como el elegido (Regresión logística), una empresa de telecomuniciones es capáz de emprender campañas de retención que pueden variar según se amerite, debido a la habilidad de detectar perfiles de clientes propensos al abandono.</span>
+<span id="cb45-476"><a href="#cb45-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-477"><a href="#cb45-477" aria-hidden="true" tabindex="-1"></a>Si bien es cierto que Teleco podría tener conocimiento de que los clientes con menor antiguedad son más propensos a abandonar, sería un desperdicio de recursos el simplemente contactar a todo cliente con X cantidad de meses utilizando el servicio. Si en lugar de eso partimos de las clasificaciones realizadas por el modelo podremos ser mucho mas eficientes ya que 7 de cada 10 contactos hechos alcanzarían el objetivo (por su pos pred value de 0.6818). A continuación una lista de posibilidades:</span>
+<span id="cb45-478"><a href="#cb45-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-479"><a href="#cb45-479" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Se obtiene una garantía estadística** de que el equipo no está perdiendo el tiempo llamando a perfiles aleatorios, lo cual les permite planear.</span>
+<span id="cb45-480"><a href="#cb45-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-481"><a href="#cb45-481" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>En lugar de enviar descuentos masivos a toda la base (**lo cual erosiona el margen de beneficio**), el departamento encargado de la campaña de retención utiliza el listado generado por el modelo.</span>
+<span id="cb45-482"><a href="#cb45-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-483"><a href="#cb45-483" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Al tener una especificidad tan alta, la empresa **evita molestar al 91% de sus clientes leales** con ofertas innecesarias, protegiendo así el Valor de Vida del Cliente (CLV).</span>
+<span id="cb45-484"><a href="#cb45-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-485"><a href="#cb45-485" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Es posible para la dirección **tomar medidas correctivas anticipadas** (como ajustes en la estrategia de precios o mejora de infraestructura en zonas específicas) antes de que el impacto financiero se refleje en el balance general.</span>
+</code></pre></div><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+<script src="Actividad 2_files/libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

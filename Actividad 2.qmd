@@ -1,0 +1,429 @@
+---
+title: "Actividad 2: Modelos de clasificación"
+author: 
+  - "Gabriel Castro" 
+  - "Leonardo Cortes"
+  - "Karolina Cedeño"
+language:
+  author-title: "Autores"
+lang: es
+theme: "minty"
+date: "2026-1-12"
+format: 
+  html:
+    df-print: paged
+    code-fold: true
+    code-tools:
+      source: true
+      toggle: false
+    toc: true
+    toc-location: "left"
+    toc-depth: 4
+    number-sections: true
+    smooth-scroll: true
+    
+    
+editor: visual
+---
+
+## Instalación de librerías e importación de dataset
+
+A continuación procedemos con la instalacion de paquetes requeridos para llevar a cabo nuestos analisis e implementacion de modelos ML.
+
+```{r}
+#| warning: false
+#| message: false
+
+#install.packages("tidyverse")
+#install.packages("caret")
+#install.packages("forecast")
+#install.packages("fastDummies")
+#install.packages("rpart")
+#install.packages("rpart.plot")
+
+library(tidyverse)
+library(caret)
+library(fastDummies)
+library(forecast)
+library(rpart)
+library(rpart.plot)
+
+teleco <- read_csv("C:/Users/gicr9/OneDrive/Desktop/UNIR/Análisis de Datos Masivos para el Negocio/Actividades/Actividad 2/datos_teleco_Act2_ADMN.csv")
+```
+
+Para conocer las diferentes tipos de variables que componen el set de datos utilizamos las funciones `str()` y `head()` .
+
+::: panel-tabset
+## Estructura de los datos
+
+```{r}
+str(teleco)
+```
+
+## Vista previa de los datos {.active}
+
+```{r}
+head(teleco)
+```
+:::
+
+## Evaluación de calidad de los datos
+
+Procedemos a evaluar los datos revisando las medidas de posición y dispersión de los mismos, en adición a los comprobar si existen datos nulos.
+
+### Estadística descriptiva de datos numéricos
+
+Procedemos a utilizar diversas funciones para obtener medidas de tendencia central, posición y disperción con la finalidad de comprender el set de datos con el que estamos trabajando. Nos enfocaremos en la variable **Meses_alta**, ya que es la única variable numérica de las indicadas que utilizaremos para nuestro modelo de clasificación.
+
+```{r}
+#Medidas de posición y tendencia central
+
+summary(Filter(is.numeric, teleco))
+```
+
+```{r}
+#Desviación Estandar
+
+cat("Desviación Estandar:\n",sd(teleco$Meses_alta))
+```
+
+```{r}
+# coeficiente de variación
+
+C_var_alta <- sd(teleco$Meses_alta)/mean(teleco$Meses_alta)
+
+
+cat("coeficiente de variación:\n",C_var_alta)
+```
+
+```{r}
+# Existen nulos en el dataset?
+
+cat("Existen nulos en el dataset?\n",any(is.na(teleco)))
+```
+
+#### Apoyo visual
+
+[Histograma:]{.underline}
+
+```{r}
+#| warning: false
+ggplot(data = teleco,
+       aes(x = Meses_alta, 
+           fill = Abandono)) + 
+  geom_histogram(binwidth = 4,
+                 boundary = 1,
+                 color = "white",
+                 position = "stack") +
+  labs(title = "Distribución: Meses de Alta de Los Clientes",
+       x = "Meses de Alta", 
+       y = "Cantidad de Clientes", 
+       fill = "Abandono?") + 
+  scale_x_continuous(breaks = seq(from = 1, 
+                                  to = 73, 
+                                  by = 4 )) + 
+  theme_classic() + 
+  scale_fill_brewer(palette = "Set2")
+```
+
+#### Interpretación de los datos
+
+Al observar las estadísticas pertinentes a éste set de datos podemos inferir lo siguiente:
+
+-   La media y la mediana para **Meses_Alta** están relativamente cerca, lo que normalmente indica que los datos parecen tener una distribución relativamente, pero al ver su distancia de los extremos y corroborar con el histograma, notamos que en realidad tenemos una distribución bimodal/en forma de U.
+
+-   Los mayores grupos de clientes son aquellos con un alta de entre 1 a 5 meses y los de 69 a 73, siendo el primero de estos grupos el que abarca el mayor numero de clientes. Aparentemente el grupo con menor tiempo es tambén el más susceptible a abandonar el servicio a diferencia de los grupos de clientes más antiguos.
+
+-   Una desviación estandar de 24.25 y un coeficiente de variación de 0.76 nos deja claro que estamos ante datos bastante dispersos.
+
+-   No existen valores nulos en el dataset, lo que hasta el momento y en conjunto con las demás estadísticas nos indica una calidad de datos solida.
+
+## Selección y transformación de variables
+
+Tras haber evaluado la calidad del dataset, iniciamos el proceso a través del cual seleccionaremos y variables y utilizaremos técnicas como el "label encoding" y transformaremos variables para adecuarlas a los modelos de ML que serán utilizados más adelante.
+
+```{r}
+teleco_short <- teleco %>% select(Contrato, Factura_digital, Servicio_Internet, Soporte_tecnico, CopiaSeguridad_Online, Television_carta, Meses_alta, Abandono)
+
+head(teleco_short)
+```
+
+Antes de proceder a transformar nuestras variables seleccionadas, queremos saber con cuantas categorias cuenta cada una y cuantas veces se repiten las mismas dentro de su respectivo campo.
+
+::: panel-tabset
+## Contrato
+
+```{r}
+teleco_short %>% count(Contrato)
+```
+
+## Factura_digital
+
+```{r}
+teleco_short %>% count(Factura_digital)
+```
+
+## Servicio_Internet
+
+```{r}
+teleco_short %>% count(Servicio_Internet)
+```
+
+## Soporte_tecnico
+
+```{r}
+teleco_short %>% count(Soporte_tecnico)
+```
+
+## CopiaSeguridad_Online
+
+```{r}
+teleco_short %>% count(CopiaSeguridad_Online)
+```
+
+## Television_carta
+
+```{r}
+teleco_short %>% count(Television_carta)
+
+```
+
+## Meses_Alta
+
+```{r}
+teleco_short %>% count(Meses_alta)
+```
+
+## Abandono
+
+```{r}
+teleco_short %>% count(Abandono)
+```
+:::
+
+Podemos observar quer tres de nuestras variables poseen una categoría redundante. "**No internet service**" Es redundante y causa multicolinearidad ya que si un cliente no tiene internet, entonces tampoco tiene soporte tecnico, copia de seguridad o television por carta. Por lo que para resolver este problema solo debemos reemplazar ésta categoría por un simple "**No**".
+
+```{r}
+teleco_short <- teleco_short %>% mutate(across(c(Soporte_tecnico,
+                                                 CopiaSeguridad_Online,
+                                                 Television_carta),
+                                               ~ifelse(.x == "No internet service",
+                                                       "No", .x)))
+
+```
+
+[**Despues de cambios:**]{.underline}
+
+::: panel-tabset
+## Soporte_tecnico
+
+```{r}
+teleco_short %>% distinct(Soporte_tecnico)
+```
+
+## CopiaSeguridad_online
+
+```{r}
+teleco_short %>% distinct(CopiaSeguridad_Online)
+```
+
+## Television_carta
+
+```{r}
+teleco_short %>% distinct(Television_carta)
+```
+:::
+
+Una vez hemos hecho estos cambios, procedemos con la creación de un set de datos al cual llamaremos "teleco_final", el cual utilizaremos para entrenar y evaluar el desempeño de nuestros modelos de clasificación.
+
+```{r}
+teleco_final <- dummy_cols(teleco_short,
+                           select_columns = c("Contrato",
+                                              "Servicio_Internet",
+                                              "Factura_digital",
+                                              "Soporte_tecnico",
+                                              "CopiaSeguridad_Online",
+                                              "Television_carta",
+                                              "Abandono"),
+                           remove_first_dummy = TRUE,
+                           remove_selected_columns = TRUE)
+
+names(teleco_final)[10] <- "Abandono" #Para mantener el nombre original"
+str(teleco_final)
+head(teleco_final)
+```
+
+Al crear estas columnas el codigo genera una variable dummy por cada categoria existente, por lo cual si queremos que nuestro modelo pueda realizar calculos de manera correcta, procedemos a utilizar el `remove_first_dummy = TRUE`. Esto ayuda a eliminar redundancia. Para explicarlo de manera un poco más clara, tomemos como el ejemplo de la variable "Contrato".
+
+| Mes a mes | Un año | Dos años |
+|-----------|--------|----------|
+| X         | X      | **O**    |
+| X         | **O**  | X        |
+| **O**     | X      | X        |
+
+En este caso la "**O"** significa "si", mientras que la "X" significa "no". Al ver la tabla nos queda claro que cuando el cliente no tiene un contrato de uno o de dos años es porque tiene un contrato "mes a mes". Si ya sabemos que la respuesta solo puede ser una de tres opciones, entonces para saber el tipo de contrato realmente basta con saber el estado "si" o "no" para dos de los tres tipos de contrato.
+
+## Modelos de clasificación
+
+A continuación utilizaremos una semilla y separaremos los datos con una distribución 80/20 para entrenamiento y prueba respectivamente mediante la función `createDaraPar`, para luego asignar dicha partición de datos en sus respectivas variables de entrenamiento y prueba (**train** y **test**).
+
+```{r}
+set.seed(123)
+trainIndex <- createDataPartition(teleco_final$Abandono, p=0.8, list=FALSE)
+train <- teleco_final[trainIndex, ]
+test <- teleco_final[-trainIndex, ]
+
+cat('Dimensiones de datos de entrenamiento:\n',dim(train),'\n')
+cat('Dimensiones de datos de prueba:\n',dim(test))
+
+```
+
+### Modelo de regresión logística
+
+Para este modelo de regresión logística utilizamos las funsiones `glm()` y `summary()`. La primera nos construye el modelo con la ayuda de los datos de entrenamiento particionados anteriormente, mientras que la segunda nos ayuda a visualizar los coeficientes de cada variable involucrada para visualizar como afectan el modelo.
+
+```{r}
+# Modelo de regresión logística
+modelo_rlog <- glm(Abandono ~ ., data=train, family='binomial')
+
+summary(modelo_rlog)
+
+
+```
+
+Los coeficientes nos indican que las variables que impactan en la decisión de abandonar (sí) son \`"**Servicio_Internet_Fiber optic","Factura_digital_Yes" y "Television_carta_Yes"**; En otras palabras:
+
+-   ¿Tiene el cliente servicio de internet de Fibra Optica?
+
+-   ¿Recibe el cliente factura digital?
+
+-   ¿Tiene el cliente servicio de televisión a la carta?
+
+Las tres variables poseen un p-valor menor 0.05, lo que nos indica que los resultados arrojados por el modelo son estadisticamente significativos, no producto del azar. Ésto ya nos da puntos de enfoque a los cuales podemos dirigir esfuerzos para prevenir el avandono. Ejemplos de dichos esfuerzos serían proporcionados más adelante segun el desempeño del modelo.
+
+#### Evaluación del modelo
+
+Hacemos uso de los datos en la partición de prueba con el objetivo de crear predicciones para datos que nuestro modelo no ha insteractuado durante su entrenamiento. Luego usamos una matriz de confusión para observar los resultados de dichas predicciones, midiendo entre otras cosas los aciertos y desaciertos.
+
+```{r}
+# Predicciones sobre el conjunto de prueba
+predicciones_rlog <- predict(modelo_rlog, newdata=test, type='response')
+predicciones_rlog <- round(predicciones_rlog)
+predicciones_rlog <- as.factor(predicciones_rlog)
+test$Abandono <- as.factor(test$Abandono)
+
+# Matriz de confusión
+confusion_matrix <- confusionMatrix(predicciones_rlog, 
+                                    test$Abandono, 
+                                    positive = "1")
+confusion_matrix
+```
+
+Trás ejecutar el código para la evaluación de predicciones de nuestro modelo podemos observar:
+
+-   **La precisión (Accuracy)** de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).
+
+-   **El valor-P** para la precisión se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).
+
+-   **Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de regresión predice bien quién se mantiene leal a la empresa con apenas errores (**0 = No, nuestra categoría mayoritaria**), mientras que es más conservador al predecir los clientes que abandonan.
+
+### Modelo de Árbol
+
+Similar a como hicimos con el modelo de regresión logística, El modelo de árbol es entrenado con los datos particionados anteriormente, pero adicionalmente en esta ocasión utilizamos la función `print()` para leer los resultados que nos arroja el mismo .
+
+```{r}
+#Modelo de Arbol
+modelo_arbol <- rpart(Abandono ~ ., data=train, method = 'class')
+
+print(modelo_arbol)
+
+
+summary(modelo_arbol)
+```
+
+#### Diagrama de Árbol de decisión
+
+La implementación de `rpart.plot()` en éste caso nos ayuda a visualizar los resultados de nuestro modelo de árbol en un diagrama para su mayor compresión.
+
+```{r}
+rpart.plot(modelo_arbol,
+           extra = 101,
+           under = TRUE,
+           main = "Árbol de Decisión: Predicción de Abandono",
+           box.palette = "GnYlRd") #rango de colores verde a rojo por abandono
+```
+
+Nuestro modelo de árbol distingue dos variables como las de mayor importancia a la hora de predecir si los clientes de Teleco abandonarán sus servicios o permanecerán leales. Éstas variables son:
+
+-   **Meses_alta \>=17:** En otras palabras, **el cliente tiene antiguedad mayor o igual a 17 meses**. De la respuesta ser "Sí/Yes" entonces el modelo pasa a la izquierda a 3591 clientes (el 64%) de los clientes. y de ellos el 564 abandona (16%). Este es nuestro nodo con menor porcentaje de abandono, indicándonos que mientras más tiempo tiene el cliente con el servicio. este es menos propenso a abandonar.
+
+-   **Servicios_internet_Fiber optic = 0:** Para el 36% restante de clientes el enunciado sería, **el cliente no tiene servicio de Fribra Optica.** De la respuesta ser "No" estaríamos afirmando que el cliente de hecho si tiene el servicio y curiosamente éste es el grupo/nodo a pesar de representar solo el 16% de los clientes, también es el nodo con mayor tasa de abandono con 587 de 878 (67%). Como negocio convendría investigar exactamente que causa que tantos de los clientes con este servicio abandone.
+
+#### Evaluación del modelo
+
+Al igual que con el modelo de regresión logística, evaluamos el modelo de árbol generando predicciones con un set de datos con el que no fue entrenado y luego llevamos dichas predicciones a una matriz de confusión.
+
+```{r}
+# Predicciones sobre el conjunto de prueba
+predicciones_arbol <- predict(modelo_arbol, newdata=test, type='class')
+predicciones_arbol <- as.factor(predicciones_arbol)
+
+# Matriz de confusión
+confusion_matrix_arbol <- confusionMatrix(predicciones_arbol, 
+                                          test$Abandono,
+                                          positive = "1")
+confusion_matrix_arbol
+```
+
+Observaciones:
+
+-   **La precisión (Accuracy)** de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya precisión fue de 0.8158.
+
+-   Al igual que en nuestro anterior modelo, **el valor-P** para la precisión se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).
+
+-   **Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de árbol de decisión es aún mejor al predecir quién se mantiene leal a la empresa al obtener un 0.9453 en especificidad contra 0.9128 del modelo anterior; sin embargo es aún más conservador al predecir los clientes que abandonan al obtener solo un 0.4215 en sensibilidad contra 0.5372 en el modelo de regresión logística.
+
+## Elección de modelo y posible aplicación
+
+Ambos modelos están entrenados en un set de datos cuya variable dependiente está considerablemente desproporcionada, ya que la basta mayoría de los clientes de Teleco son leales. Ésto ocasiona que ambos modelos sean mucho mejores prediciendo que clientes se quedan, en lugar de predecir que clientes se abandonan la empresa. Existen técnicas en la ciencia de datos para solventar esta problemática; sin embargo, las mismas están fuera del alcance de lo requerido para ésta entrega
+
+### Comparasión de modelos
+
+Tomando en cuenta las limitaciones anteriormente mencionadas procedemos a comparar los modelos de clasificación:
+
+|  |  |  |  |
+|------------------|------------------|------------------|------------------|
+| **Métrica** | **Modelo A (Regresión logística)** | **Modelo B (Árbol)** | **Ventaja para Teleco** |
+| **Precisión (Accuracy)** | 0.8158 | 0.8101 | **Modelo A:** Mayor nivel de acierto global. |
+| **Sensibilidad** | 0.5372 | 0.4215 | **Modelo A:** Detecta un 11.5% más de clientes que se van. |
+| **Especificidad** | 0.9128 | 0.9453 | **Modelo B:** Es más seguro identificando clientes leales. |
+| **Precisión (Pos Pred Value)** | 0.6818 | 0.7286 | **Modelo B:** Sus alertas de "abandono" son más certeras. |
+| **Confianza (P-Value)** | 3.232e-11 | 9.387e-10 | **Modelo A:** Mayor solidez estadística frente al azar. |
+
+Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar decidido agregar a esta tabla de comparación la métrica de "pos(positive) pred(prediction) value" la cual mide la precisión de los aciertos al predecir "Sí/Yes". Esto nos ayudará a enfocar un aspecto importante de la comparación.
+
+Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:
+
+-   **El modelo de árbol** **de decisiones** con su **pos pred value** de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una **sensibilidad** de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.
+
+-   **El modelo de regresión logística** posee un **pos pred value** de 0.6818 lo cual no lo sitúa muy distante del modelo de árbol, pero a la vez tiene una **sensibilidad** mayor con un 0.5372. Esto lo hace un modelo menos conservador a la hora de hacer predicciones de abandono, aunque la certeza de dichas predicciones sea ligeramente menor.
+
+Estos aspectos nos permiten corroborar algo que se puede apreciar en la matriz de confusión para cada modelo. El modelo de árbol de decisiones deja escapar a una mayor cantidad de clientes que el modelo de regresión logística con 210 falsos negativos contra 168 respectivamente. En la administración de servicios de telecomunicaciones, el costo de un **falso negativo** (no detectar a un cliente que se va) es considerablemente mayor al costo de un **falso positivo** (dar un beneficio de retención a un cliente que se quedaría).
+
+Al colocar en una balanza ofrecer un descuento como beneficio de retención a 34 clientes (la diferencia de falsos positivos entre ambos modelos) o perder el ingreso fijo proveniente de 42 clientes, la elección parece evidente, especialmente tomando en cuenta que el modelo de regresión logística ademas de todo lo mencionado cuenta con una confianza (P-value) más solida sin entrar en detalle en otras métricas como kappa que nos indican que los resultados obtenidos son en realidad producto de la inteligencia del modelo.
+
+**Modelo elegido:** Regresión Logística (modelo A).
+
+### Posible aplicación y beneficios
+
+Con un modelo de clasificación como el elegido (Regresión logística), una empresa de telecomuniciones es capáz de emprender campañas de retención que pueden variar según se amerite, debido a la habilidad de detectar perfiles de clientes propensos al abandono.
+
+Si bien es cierto que Teleco podría tener conocimiento de que los clientes con menor antiguedad son más propensos a abandonar, sería un desperdicio de recursos el simplemente contactar a todo cliente con X cantidad de meses utilizando el servicio. Si en lugar de eso partimos de las clasificaciones realizadas por el modelo podremos ser mucho mas eficientes ya que 7 de cada 10 contactos hechos alcanzarían el objetivo (por su pos pred value de 0.6818). A continuación una lista de posibilidades:
+
+-   **Se obtiene una garantía estadística** de que el equipo no está perdiendo el tiempo llamando a perfiles aleatorios, lo cual les permite planear.
+
+-   En lugar de enviar descuentos masivos a toda la base (**lo cual erosiona el margen de beneficio**), el departamento encargado de la campaña de retenciówen utiliza el listado generado por el modelo.
+
+-   Al tener una especificidad tan alta, la empresa **evita molestar al 91% de sus clientes leales** con ofertas innecesarias, protegiendo así el Valor de Vida del Cliente (CLV).
+
+-   Es posible para la dirección **tomar medidas correctivas anticipadas** (como ajustes en la estrategia de precios o mejora de infraestructura en zonas específicas) antes de que el impacto financiero se refleje en el balance general.
