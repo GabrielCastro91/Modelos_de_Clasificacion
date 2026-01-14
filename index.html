@@ -4171,8 +4171,8 @@ Prediction   0   1
 </div>
 <p>Trás ejecutar el código para la evaluación de predicciones de nuestro modelo podemos observar:</p>
 <ul>
-<li><p><strong>La precisión (Accuracy)</strong> de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</p></li>
-<li><p><strong>El valor-P</strong> para la precisión se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</p></li>
+<li><p><strong>La exactitud (Accuracy)</strong> de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</p></li>
+<li><p><strong>El valor-P</strong> para la exactitud se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</p></li>
 <li><p><strong>Especificidad (specificity) y sensibilidad (sensitivity)</strong> nos indican que éste modelo de regresión predice bien quién se mantiene leal a la empresa con apenas errores (<strong>0 = No, nuestra categoría mayoritaria</strong>), mientras que es más conservador al predecir los clientes que abandonan.</p></li>
 </ul>
 </section>
@@ -4341,8 +4341,8 @@ Prediction   0   1
 </div>
 <p>Observaciones:</p>
 <ul>
-<li><p><strong>La precisión (Accuracy)</strong> de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya precisión fue de 0.8158.</p></li>
-<li><p>Al igual que en nuestro anterior modelo, <strong>el valor-P</strong> para la precisión se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</p></li>
+<li><p><strong>La exactitud (Accuracy)</strong> de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya exactitud fue de 0.8158.</p></li>
+<li><p>Al igual que en nuestro anterior modelo, <strong>el valor-P</strong> para la exactitud se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</p></li>
 <li><p><strong>Especificidad (specificity) y sensibilidad (sensitivity)</strong> nos indican que éste modelo de árbol de decisión es aún mejor al predecir quién se mantiene leal a la empresa al obtener un 0.9453 en especificidad contra 0.9128 del modelo anterior; sin embargo es aún más conservador al predecir los clientes que abandonan al obtener solo un 0.4215 en sensibilidad contra 0.5372 en el modelo de regresión logística.</p></li>
 </ul>
 </section>
@@ -4369,7 +4369,7 @@ Prediction   0   1
 <td><strong>Ventaja para Teleco</strong></td>
 </tr>
 <tr class="even">
-<td><strong>Precisión (Accuracy)</strong></td>
+<td><strong>Exactitud (Accuracy)</strong></td>
 <td>0.8158</td>
 <td>0.8101</td>
 <td><strong>Modelo A:</strong> Mayor nivel de acierto global.</td>
@@ -4401,7 +4401,7 @@ Prediction   0   1
 </tbody>
 </table>
 <p>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar se ha decidido agregar a esta tabla de comparación la métrica de “pos(positive) pred(prediction) value” la cual mide la precisión de los aciertos al predecir “Sí/Yes”. Esto nos ayudará a enfocar un aspecto importante de la comparación.</p>
-<p>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</p>
+<p>Si bien pode podemos observar que la exactitud de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</p>
 <ul>
 <li><p><strong>El modelo de árbol</strong> <strong>de decisiones</strong> con su <strong>pos pred value</strong> de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una <strong>sensibilidad</strong> de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.</p></li>
 <li><p><strong>El modelo de regresión logística</strong> posee un <strong>pos pred value</strong> de 0.6818 lo cual no lo sitúa muy distante del modelo de árbol, pero a la vez tiene una <strong>sensibilidad</strong> mayor con un 0.5372. Esto lo hace un modelo menos conservador a la hora de hacer predicciones de abandono, aunque la certeza de dichas predicciones sea ligeramente menor.</p></li>
@@ -5202,9 +5202,9 @@ Prediction   0   1
 <span id="cb45-372"><a href="#cb45-372" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-373"><a href="#cb45-373" aria-hidden="true" tabindex="-1"></a>Trás ejecutar el código para la evaluación de predicciones de nuestro modelo podemos observar:</span>
 <span id="cb45-374"><a href="#cb45-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-375"><a href="#cb45-375" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La precisión (Accuracy)** de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</span>
+<span id="cb45-375"><a href="#cb45-375" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La exactitud (Accuracy)** de 0.8158 indica que nuestro modelo de clasificación ha predicho correctamente la basta mayoría de los datos 1147/1406 (el 82%).</span>
 <span id="cb45-376"><a href="#cb45-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-377"><a href="#cb45-377" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El valor-P** para la precisión se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</span>
+<span id="cb45-377"><a href="#cb45-377" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El valor-P** para la exactitud se encuentra considerablemente por debajo del 0.05 requerido para que los resultados fueran estadísticamente significativos (no al azar).</span>
 <span id="cb45-378"><a href="#cb45-378" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-379"><a href="#cb45-379" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de regresión predice bien quién se mantiene leal a la empresa con apenas errores (**0 = No, nuestra categoría mayoritaria**), mientras que es más conservador al predecir los clientes que abandonan.</span>
 <span id="cb45-380"><a href="#cb45-380" aria-hidden="true" tabindex="-1"></a></span>
@@ -5258,9 +5258,9 @@ Prediction   0   1
 <span id="cb45-434"><a href="#cb45-434" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-435"><a href="#cb45-435" aria-hidden="true" tabindex="-1"></a>Observaciones:</span>
 <span id="cb45-436"><a href="#cb45-436" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-437"><a href="#cb45-437" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La precisión (Accuracy)** de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya precisión fue de 0.8158.</span>
+<span id="cb45-437"><a href="#cb45-437" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**La exactitud (Accuracy)** de 0.8101 es ligeramente inferior a la de nuestro anterior modelo de regresión logística cuya exactitud fue de 0.8158.</span>
 <span id="cb45-438"><a href="#cb45-438" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-439"><a href="#cb45-439" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Al igual que en nuestro anterior modelo, **el valor-P** para la precisión se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</span>
+<span id="cb45-439"><a href="#cb45-439" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Al igual que en nuestro anterior modelo, **el valor-P** para la exactitud se encuentra bastante por debajo del 0.05, por lo que los resultados son estadísticamente significativos (no al azar).</span>
 <span id="cb45-440"><a href="#cb45-440" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-441"><a href="#cb45-441" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**Especificidad (specificity) y sensibilidad (sensitivity)** nos indican que éste modelo de árbol de decisión es aún mejor al predecir quién se mantiene leal a la empresa al obtener un 0.9453 en especificidad contra 0.9128 del modelo anterior; sin embargo es aún más conservador al predecir los clientes que abandonan al obtener solo un 0.4215 en sensibilidad contra 0.5372 en el modelo de regresión logística.</span>
 <span id="cb45-442"><a href="#cb45-442" aria-hidden="true" tabindex="-1"></a></span>
@@ -5275,7 +5275,7 @@ Prediction   0   1
 <span id="cb45-451"><a href="#cb45-451" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span>  <span class="pp">|</span></span>
 <span id="cb45-452"><a href="#cb45-452" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------|------------------|------------------|------------------|</span></span>
 <span id="cb45-453"><a href="#cb45-453" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Métrica** | **Modelo A (Regresión logística)** | **Modelo B (Árbol)** | **Ventaja para Teleco** <span class="pp">|</span></span>
-<span id="cb45-454"><a href="#cb45-454" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Precisión (Accuracy)** | 0.8158 | 0.8101 | **Modelo A:** Mayor nivel de acierto global. <span class="pp">|</span></span>
+<span id="cb45-454"><a href="#cb45-454" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Exactitud (Accuracy)** | 0.8158 | 0.8101 | **Modelo A:** Mayor nivel de acierto global. <span class="pp">|</span></span>
 <span id="cb45-455"><a href="#cb45-455" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Sensibilidad** | 0.5372 | 0.4215 | **Modelo A:** Detecta un 11.5% más de clientes que se van. <span class="pp">|</span></span>
 <span id="cb45-456"><a href="#cb45-456" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Especificidad** | 0.9128 | 0.9453 | **Modelo B:** Es más seguro identificando clientes leales. <span class="pp">|</span></span>
 <span id="cb45-457"><a href="#cb45-457" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Precisión (Pos Pred Value)** | 0.6818 | 0.7286 | **Modelo B:** Sus alertas de &quot;abandono&quot; son más certeras. <span class="pp">|</span></span>
@@ -5283,7 +5283,7 @@ Prediction   0   1
 <span id="cb45-459"><a href="#cb45-459" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-460"><a href="#cb45-460" aria-hidden="true" tabindex="-1"></a>Cabe decir que como nuestro interés principal es el del predecir cuando un cliente va a abandonar se ha decidido agregar a esta tabla de comparación la métrica de &quot;pos(positive) pred(prediction) value&quot; la cual mide la precisión de los aciertos al predecir &quot;Sí/Yes&quot;. Esto nos ayudará a enfocar un aspecto importante de la comparación.</span>
 <span id="cb45-461"><a href="#cb45-461" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-462"><a href="#cb45-462" aria-hidden="true" tabindex="-1"></a>Si bien pode podemos observar que la precisión de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</span>
+<span id="cb45-462"><a href="#cb45-462" aria-hidden="true" tabindex="-1"></a>Si bien podemos observar que la exactitud de ambos a nivel general es muy similar. podemos ver las siguientes diferencias relevantes relacionadas a nuestro objetivo de predecir abandonos:</span>
 <span id="cb45-463"><a href="#cb45-463" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb45-464"><a href="#cb45-464" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>**El modelo de árbol** **de decisiones** con su **pos pred value** de 0.7286 tiene mas probabilidades de acierto al predecir que un cliente va a abandonar, pero con una **sensibilidad** de 0.4215 es considerablemente más conservador a la hora de hacer dicha predicción. En otras palabras, es bueno prediciendo pero la cantidad de predicciones de abandono es poca.</span>
 <span id="cb45-465"><a href="#cb45-465" aria-hidden="true" tabindex="-1"></a></span>
