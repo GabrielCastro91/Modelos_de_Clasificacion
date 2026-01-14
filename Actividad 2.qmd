@@ -387,7 +387,7 @@ Observaciones:
 
 Ambos modelos están entrenados en un set de datos cuya variable dependiente está considerablemente desproporcionada, ya que la basta mayoría de los clientes de Teleco son leales. Ésto ocasiona que ambos modelos sean mucho mejores prediciendo que clientes se quedan, en lugar de predecir que clientes se abandonan la empresa. Existen técnicas en la ciencia de datos para solventar esta problemática; sin embargo, las mismas están fuera del alcance de lo requerido para ésta entrega
 
-### Comparasión de modelos
+### Comparación de modelos
 
 Tomando en cuenta las limitaciones anteriormente mencionadas procedemos a comparar los modelos de clasificación:
 
@@ -427,3 +427,4 @@ Si bien es cierto que Teleco podría tener conocimiento de que los clientes con 
 -   Al tener una especificidad tan alta, la empresa **evita molestar al 91% de sus clientes leales** con ofertas innecesarias, protegiendo así el Valor de Vida del Cliente (CLV).
 
 -   Es posible para la dirección **tomar medidas correctivas anticipadas** (como ajustes en la estrategia de precios o mejora de infraestructura en zonas específicas) antes de que el impacto financiero se refleje en el balance general.
+
